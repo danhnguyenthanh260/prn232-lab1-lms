@@ -29,3 +29,4 @@ Baseline kế hoạch được push tại commit `2330122`; checkpoint tiếp th
 - Brief LMS gồm browser routes, pattern list/detail/form, tokens sửa contrast, field-purpose mapping, responsive/state/keyboard plan và giới hạn API. Đây là design review, không phải kết quả UI runtime.
 - Snapshot và readback chi tiết lưu local trong `tools/publication/model-update-receipt.json` (ignored). Không rerun publisher baseline để ghi đè phần bổ sung trên GitHub.
 - Build, DB, Docker, grader và frontend rendered checks: **NOT RUN**, chưa có ứng dụng.
+- Tài liệu mô hình/thiết kế đã push tại `0dc7825`. Sau push, 12 file công khai (gồm ba tài liệu mới) được đọc lại qua GitHub, khớp blob đã commit và nội dung UTF-8; cả 19 issue vẫn render heading/checkboxes. Checkpoint sau chỉ ghi lại bằng chứng này.

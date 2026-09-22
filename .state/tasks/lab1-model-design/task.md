@@ -7,6 +7,7 @@
 - Local documents: docs/database-model.md, docs/api-routes.md, docs/design-pattern.md.
 - Complete: snapshot-aware enrichment of all 11 allowed issues; exact body/HTML heading readback and metadata/dependency/project-field preservation verified.
 - Complete: local planning validator exit 0 (79 mappings, 21 criteria, 13 routes, 5 entities/20 columns/3 FK); git diff --check passed.
-- Pending: publish documentation and verify committed remote blobs.
+- Complete: documentation commit 0dc7825 pushed to main; 12 published files read back and matched committed blobs/UTF-8 text. All 19 issue bodies rendered headings/checkboxes.
+- Status: design/documentation task done. No implementation issue closed; next step requires a request to implement the API or UI.
 - No frontend code/build, DB, Docker or grader execution. Optional UI remains outside 19 graded implementation issues.
 - Detailed repo receipt: repos/prn232-lab1-lms.md.

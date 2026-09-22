@@ -13,4 +13,5 @@ __pycache__/
 *.ldf
 *.bacpac
 .env
+submission.local.json
 !.env.example

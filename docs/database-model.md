@@ -1,6 +1,6 @@
 # Mô hình dữ liệu LMS
 
-Phạm vi: thiết kế, chưa có migration hoặc DB chạy thật. Căn cứ: B trang 1 và G trong [nguồn](sources.md), coverage D01–D06; theo dõi ở [issue #3](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/3).
+Phạm vi: mô hình thiết kế; bản triển khai và DB đã kiểm tra xem [implementation](implementation.md). Căn cứ: B trang 1 và G trong [nguồn](sources.md), coverage D01–D06; theo dõi ở [issue #3](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/3).
 
 ## ERD
 

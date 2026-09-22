@@ -1,0 +1,1299 @@
+{
+  "owner": "danhnguyenthanh260",
+  "repo": "prn232-lab1-lms",
+  "issues": [
+    {
+      "key": "TRACK",
+      "title": "[Theo dõi] Coverage toàn bộ đề bài, rubric và nghiệm thu Lab 1",
+      "area": "planning",
+      "phase": "M3 - Đóng gói và nghiệm thu",
+      "priority": "P1",
+      "deps": [],
+      "scope": "docs/coverage.md, docs/plan.md; theo dõi các issue còn lại",
+      "outcome": "Mỗi yêu cầu của đề có issue thực hiện, cách kiểm tra và bằng chứng khi hoàn thành. Coverage ở đây là coverage kế hoạch, chưa phải phần trăm code/test đã đạt.",
+      "accept": [
+        "Đối chiếu đủ ST-01–ST-09, DY-01–DY-12 và 6 penalty với trọng số đúng 4,0 + 6,0.",
+        "Mọi yêu cầu tài liệu kể cả phần grader không kiểm tra đều có owner issue và acceptance.",
+        "Lưu riêng các mâu thuẫn tài liệu, giả định thiết kế và giới hạn của screenshot/mock.",
+        "Chỉ đóng tracker khi tất cả issue phụ thuộc hoàn tất và QA xác nhận artifact ZIP cuối cùng."
+      ]
+    },
+    {
+      "key": "ARCH",
+      "title": "[Nền tảng] Solution 3 layer, DI và 4 loại model",
+      "area": "architecture",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [],
+      "scope": "PRN232.LMS.sln; PRN232.LMS.API/, PRN232.LMS.Services/, PRN232.LMS.Repositories/; project files, Program.cs, DI extensions",
+      "outcome": "Solution có đúng ba project, chiều phụ thuộc rõ ràng, controller chỉ gọi service; bốn loại model có nơi sở hữu riêng.",
+      "accept": [
+        "Đúng PRN232.LMS.API / .Services / .Repositories; projectName=LMS, không thêm project test vào ZIP.",
+        "API→Services; Services→Repositories; API→Repositories chỉ tại DI composition root; Repositories không tham chiếu lên.",
+        "Entities ở Repositories; BusinessModels ở Services; RequestModels và ResponseModels ở API; mapping tường minh.",
+        "Controller không dùng DbContext, repository hoặc LINQ truy vấn; repository không nhận Request/Response/Dto và không xử lý nghiệp vụ.",
+        "dotnet build PRN232.LMS.sln thành công; đọc lại ProjectReference và raw-text heuristic ST-01..ST-06.",
+        "Ghi phiên bản SDK/EF/container thống nhất trong lúc thực hiện; đề không cố định phiên bản .NET.",
+        "Luồng trách nhiệm: API bind/shape response; Services validation/nghiệp vụ; Repository thực thi EF query đã xác định; không đưa EF IQueryable lên controller."
+      ]
+    },
+    {
+      "key": "DB",
+      "title": "[Dữ liệu] Schema LMS, khóa ngoại và truy cập qua EF Core",
+      "area": "data",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [
+        "ARCH"
+      ],
+      "scope": "PRN232.LMS.Repositories/Entities/, DbContext, entity configuration, migrations, repository interfaces/implementations",
+      "outcome": "Lưu đúng 5 bảng và quan hệ của đề trong SQL Server, dùng dữ liệu thật cho API.",
+      "accept": [
+        "Đúng toàn bộ cột/kiểu/độ dài của Semester, Subject, Course, Student, Enrollment trong coverage D01–D05.",
+        "Khóa chính int; Course.SemesterId→Semester; Enrollment.StudentId→Student và CourseId→Course; không có bản ghi mồ côi.",
+        "Subject đứng độc lập theo schema đề; không tự thêm SubjectId vào Course như yêu cầu bắt buộc.",
+        "Repository chỉ nhận entity hoặc scalar/query specification thuộc tầng dữ liệu, không phụ thuộc Services/API.",
+        "Migrations/schema khởi tạo được DB sạch; ghi chính sách DELETE student có enrollment trước khi thực hiện CRUD.",
+        "Không thêm quy tắc uniqueness hoặc status enum không có trong đề mà không ghi là quyết định thiết kế."
+      ]
+    },
+    {
+      "key": "BOOT",
+      "title": "[Khởi động] Migration, seed lặp lại an toàn và readiness",
+      "area": "data",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [
+        "DB"
+      ],
+      "scope": "Repositories migration/seeder; API startup orchestration và readiness state",
+      "outcome": "Khởi động từ DB rỗng tạo schema và đủ dữ liệu, restart không nhân đôi.",
+      "accept": [
+        "Thực hiện retry DB hữu hạn 5–10 lần có delay; lỗi rõ ràng khi DB không sẵn sàng.",
+        "Tự migrate hoặc tạo schema trước seed; seed tối thiểu 5/10/20/50/500 cho semesters/subjects/courses/students/enrollments.",
+        "Mọi knownIds trong submission.json tồn tại; dữ liệu liên kết đúng và student mẫu có enrollment.",
+        "Restart container không tăng số bản ghi; reset DB riêng của bài rồi up lại tái tạo đủ dữ liệu.",
+        "Readiness chỉ sẵn sàng khi DB reachable và seed đã xong; phối hợp issue DOCKER.",
+        "Dữ liệu seed có tên trùng để kiểm sort thứ hai, giá trị search phân biệt được và ngày khác nhau; không dùng dữ liệu cá nhân thật."
+      ]
+    },
+    {
+      "key": "CONTRACT",
+      "title": "[API] Envelope thống nhất, camelCase và phản hồi lỗi",
+      "area": "api",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [
+        "ARCH"
+      ],
+      "scope": "API/ResponseModels/, API validation/response helpers; boundary mapping từ Services",
+      "outcome": "Success/error có cùng JSON shape và đúng HTTP code trên tất cả API nghiệp vụ.",
+      "accept": [
+        "Có success,message,data,errors; collection data là array và pagination ở root với page,pageSize,totalItems,totalPages.",
+        "400/404 dùng success=false,data=null,errors hữu ích; không trả mặc định ProblemDetails ở model-binding/validation failure.",
+        "GET/PUT/DELETE thành công 200; POST 201 + Location; id không tồn tại 404; không dùng 204 thay cho DELETE 200.",
+        "JSON camelCase, không serialize entity trực tiếp, không $id/$ref/$values hoặc vòng lặp.",
+        "Validation cơ bản đủ cho empty name/invalid email, body thiếu/sai kiểu và query sai; không thêm framework validation phức tạp ngoài yêu cầu.",
+        "Kiểm envelope cho 5 list, 5 detail, mutation success/error và id không tồn tại; Swagger HTML/OpenAPI giữ định dạng tiêu chuẩn."
+      ]
+    },
+    {
+      "key": "QUERY",
+      "title": "[API] Query model, allowlist và quy tắc kết hợp tham số",
+      "area": "query",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [
+        "ARCH",
+        "CONTRACT"
+      ],
+      "scope": "API/RequestModels/ query binding; Services query options/validation; repository-owned scalar/query specification",
+      "outcome": "Sáu tham số query có semantics rõ ràng cho cả 5 resource và không phá ranh giới layer.",
+      "accept": [
+        "Bind đúng search,sort,page,size,fields,expand; không tự đổi thành pageNumber/pageSize/$filter.",
+        "Allowlist field/relation theo resource; sort/fields/expand lạ trả 400, không 500, kể cả khi kết quả rỗng.",
+        "page/size là số nguyên dương; default 1/10; size>100 xử lý nhất quán theo quyết định đã ghi.",
+        "Ghi semantics fields+expand: đề yêu cầu exact fields nhưng ví dụ expand field không nằm trong fields; proposal là selection cuối cùng quyết định property set, cần xác nhận với giảng viên trước chốt nghiệm thu tổ hợp.",
+        "Ghi relation allowlist: students=enrollments; courses=semester,enrollments; semesters=courses; enrollments=student,course; subjects không có relation trong schema (proposal).",
+        "Query pipeline dùng DB filter/sort/count/page trước materialization; mapping/selection tại boundary phù hợp; dữ liệu stable giữa page."
+      ]
+    },
+    {
+      "key": "STUDENT",
+      "title": "[Sinh viên] GET list và detail có enrollment",
+      "area": "api",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "BOOT",
+        "CONTRACT",
+        "QUERY"
+      ],
+      "scope": "StudentsController; Student service/repository; Student Request/Business/Response models",
+      "outcome": "Đọc sinh viên từ DB với pagination envelope và detail liên quan đúng.",
+      "accept": [
+        "GET /api/students và /api/students/{id}; controller tên số nhiều, route resource chuẩn.",
+        "Detail có toàn bộ enrollment cần thiết theo đề, không cắt cố định 5 dòng như mock; nested response hữu hạn.",
+        "List không tự nhúng related object khi thiếu expand; knownIds.students trả 200.",
+        "/999999 trả 404 và full error envelope; danh sách rỗng trả 200,data=[],metadata đúng.",
+        "Gắn đủ feature search/sort/paging/fields/expand từ các issue query; QA matrix đủ cả 5 năng lực."
+      ]
+    },
+    {
+      "key": "CATALOG",
+      "title": "[Danh mục] GET Semester, Subject và Course",
+      "area": "api",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "BOOT",
+        "CONTRACT",
+        "QUERY"
+      ],
+      "scope": "SemestersController, SubjectsController, CoursesController; services/repositories/model từng resource",
+      "outcome": "Ba danh mục có list/detail đầy đủ với cùng hợp đồng API.",
+      "accept": [
+        "Có /api/semesters, /api/subjects, /api/courses và /{id} tương ứng; seed totals ≥5,10,20.",
+        "Cả ba list áp dụng search/sort/paging/fields và expand hợp lệ theo relation allowlist.",
+        "Course detail có semester và enrollment theo thiết kế hữu hạn; Semester detail có courses; Subject giữ scalar vì đề không có FK liên quan.",
+        "Mọi id thiếu trả 404 envelope; không tự thêm endpoint CRUD danh mục thành bắt buộc.",
+        "Kiểm độc lập từng resource, kể cả query sai/empty result; không chỉ dựa grader đang sample Students."
+      ]
+    },
+    {
+      "key": "ENROLL",
+      "title": "[Đăng ký học] GET Enrollment và dữ liệu Student/Course",
+      "area": "api",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "BOOT",
+        "CONTRACT",
+        "QUERY"
+      ],
+      "scope": "EnrollmentsController; enrollment service/repository và 4 loại model",
+      "outcome": "List và detail enrollment phản ánh quan hệ sinh viên/khóa học, hỗ trợ query kết hợp.",
+      "accept": [
+        "GET /api/enrollments và /api/enrollments/{id}; totalItems ≥500 từ DB.",
+        "Detail gồm student và course; list chỉ thêm quan hệ khi expand hợp lệ.",
+        "search=active tìm theo status; sort=-enrollDate; paging/selection đúng.",
+        "Thử đúng combined URL trong phụ lục với decision fields+expand đã ghi.",
+        "Id thiếu trả 404 envelope; dữ liệu không vòng lặp và expand không làm thay đổi response của request sau."
+      ]
+    },
+    {
+      "key": "SEARCH",
+      "title": "[Query] Search không phân biệt hoa thường cho 5 resource",
+      "area": "query",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "QUERY"
+      ],
+      "scope": "Services field/search definitions; repository query cho 5 resource",
+      "outcome": "Keyword lọc đúng tập dữ liệu trước count và paging.",
+      "accept": [
+        "Contains không phân biệt hoa thường trên text fields có ý nghĩa: semesterName; subjectCode/subjectName; courseName; fullName/email; status.",
+        "Từ khóa có khoảng trắng/Unicode được truyền và xử lý đúng; không ghép SQL từ đầu vào.",
+        "Không match trả [],totalItems=0,totalPages=0; bỏ search không làm mất dữ liệu.",
+        "totalItems là số sau filter và trước paging; kết hợp sort/fields/expand không mất điều kiện lọc.",
+        "Kiểm 5 resource với matching/nonmatching/mixed case và nhiều page."
+      ]
+    },
+    {
+      "key": "SORT",
+      "title": "[Query] Sort tăng/giảm, nhiều trường và thứ tự ổn định",
+      "area": "query",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "QUERY"
+      ],
+      "scope": "Services sort allowlists; repository ordering/projection",
+      "outcome": "Sorting đúng kiểu dữ liệu và đúng thứ tự field trên 5 resource.",
+      "accept": [
+        "sort=fullName, sort=-fullName, sort=fullName,-dateOfBirth đúng cả primary và secondary field.",
+        "Sort ID/credit theo số và ngày theo thời gian, không lexicographic string.",
+        "Field lạ trả 400 envelope; field JSON camelCase ánh xạ rõ sang cột.",
+        "Thêm khóa phân xử ID để paging ổn định khi các field sort trùng (quyết định thiết kế).",
+        "Kiểm ít nhất 2 bản ghi fullName trùng với dateOfBirth khác; grader chỉ kiểm primary nên cần QA bổ sung.",
+        "So sánh thứ tự string với OrdinalIgnoreCase của grader và ghi chênh lệch collation nếu có."
+      ]
+    },
+    {
+      "key": "PAGING",
+      "title": "[Query] Paging, metadata và dữ liệu rỗng",
+      "area": "query",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "QUERY"
+      ],
+      "scope": "Services paging/validation; repository count/skip/take; API pagination model",
+      "outcome": "Mọi list trả đúng trang và metadata của tập đã lọc.",
+      "accept": [
+        "page=1,size=10 mặc định; page=2&size=5 trả 5 record khác page1 khi đủ dữ liệu.",
+        "page=0 và size=-1 mỗi tham số được kiểm riêng và trả 400; noninteger/overflow không 500.",
+        "Giới hạn size≤100; quyết định đề xuất clamp >100 thành100 được ghi (mock trả400 nên cần đối chiếu).",
+        "totalPages=ceil(totalItems/effectivePageSize); totalItems đếm trước paging sau filter.",
+        "Page vượt cuối trả [],totalItems vẫn đúng; zero result totalPages=0; stable ordering.",
+        "Kiểm cả 5 resource, page cuối không đủ size và kết hợp search/sort."
+      ]
+    },
+    {
+      "key": "SELECT",
+      "title": "[Query] Fields trả đúng property set, giữ metadata",
+      "area": "query",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "QUERY",
+        "CONTRACT"
+      ],
+      "scope": "API response shaping; Services validated selection definition; resource field maps",
+      "outcome": "Selection trả chính xác các field client yêu cầu và không làm rò rỉ entity.",
+      "accept": [
+        "fields=studentId,fullName trả đúng hai key trên mọi item, không chỉ item đầu.",
+        "pagination vẫn ở root; fields không lọc envelope hoặc metadata.",
+        "Unknown field trả400 kể cả tập rỗng; chỉ field allowlist được đọc.",
+        "Selection hỗ trợ cả 5 resource và kết hợp search/sort/page.",
+        "fields+expand theo quyết định QUERY; không tự thêm key ngược quy tắc exact-fields.",
+        "Kiểm property casing, thiếu/dư key, empty data; JSON không lỗi do ignore-null toàn cục."
+      ]
+    },
+    {
+      "key": "EXPAND",
+      "title": "[Query] Expand quan hệ đúng request và ngăn recursion",
+      "area": "query",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "DB",
+        "QUERY",
+        "CONTRACT"
+      ],
+      "scope": "Services expansion rules; repositories include/projection; API nested ResponseModels",
+      "outcome": "Related data chỉ xuất hiện khi có yêu cầu hợp lệ, không rò giữa request.",
+      "accept": [
+        "enrollments?expand=student,course trả đúng cả hai object tương ứng FK trên mọi item.",
+        "Gọi expanded rồi plain và ngược lại: plain student/course luôn absent hoặc null.",
+        "Unknown relation trả400; support relation allowlist của students/courses/semesters; Subject xử lý theo schema độc lập.",
+        "Detail vẫn chứa related data theo hợp đồng GET-by-id, độc lập default list.",
+        "Nested response hữu hạn, không ReferenceHandler.Preserve, depth/size hợp lý; không mock mutation.",
+        "Kiểm fields+expand sau khi chốt semantics; empty list và quan hệ rỗng."
+      ]
+    },
+    {
+      "key": "CRUD",
+      "title": "[Sinh viên] POST, PUT, DELETE và xác thực đầu vào cơ bản",
+      "area": "api",
+      "phase": "M2 - API và query",
+      "priority": "P1",
+      "deps": [
+        "STUDENT"
+      ],
+      "scope": "StudentsController mutation actions; RequestModels; Student service/repository",
+      "outcome": "Thay đổi sinh viên thật trong DB với status/envelope đúng và không mất tính toàn vẹn.",
+      "accept": [
+        "POST hợp lệ trả201+Location truy cập được, response có ID mới; GET lại chứng minh dữ liệu đã persist.",
+        "POST tên rỗng/email sai/body thiếu trả400 full envelope, không 500; PUT kiểm tương đương.",
+        "PUT /{id} cập nhật thật, trả200, GET lại xác minh; ID không tồn tại404.",
+        "DELETE /{id} trả200 envelope, GET lại404; xóa lại trả404.",
+        "Ghi và thực hiện chính sách FK khi student có enrollments; proposal cascade enrollment của student trong cùng transaction, cần quyết định trước thực hiện.",
+        "Test lifecycle trên student mới để không phá knownIds/seed baseline; không chỉ tin DY-12 vốn không gọi PUT/DELETE."
+      ]
+    },
+    {
+      "key": "SWAGGER",
+      "title": "[Tài liệu API] Swagger dùng được trong container",
+      "area": "api",
+      "phase": "M3 - Đóng gói và nghiệm thu",
+      "priority": "P1",
+      "deps": [
+        "STUDENT",
+        "CATALOG",
+        "ENROLL",
+        "CRUD"
+      ],
+      "scope": "API Program.cs, package references, controller response annotations và request models",
+      "outcome": "Swagger UI/OpenAPI mô tả đúng toàn bộ hợp đồng API thực tế.",
+      "accept": [
+        "/swagger và /swagger/index.html dùng được; /swagger/v1/swagger.json là OpenAPI hợp lệ.",
+        "Có đủ 13 operations nghiệp vụ: 5 list+5 detail+3 Student mutations; query parameters hiện đúng tên.",
+        "ProducesResponseType phản ánh status/schema có thể trả; DTO request/response và pagination đọc được.",
+        "Swagger bật trong container đúng environment; không chỉ chạy local IDE.",
+        "Thử Try it out GET và lifecycle trên dữ liệu thử; spec casing/path tương ứng actual routes."
+      ]
+    },
+    {
+      "key": "DOCKER",
+      "title": "[Docker] Build sạch, SQL Server, cổng động và /health",
+      "area": "runtime",
+      "phase": "M1 - Nền tảng",
+      "priority": "P0",
+      "deps": [
+        "ARCH",
+        "BOOT"
+      ],
+      "scope": "docker-compose.yml, API/Dockerfile, .dockerignore, Program.cs /health và startup wiring",
+      "outcome": "Một lệnh dựng và chạy API+DB từ trạng thái sạch, readiness phản ánh DB/seed thật.",
+      "accept": [
+        "Service tên api và db; Dockerfile multi-stage sdk→aspnet, EXPOSE8080, đúng assembly entrypoint.",
+        "API listen 8080; host mapping đúng ${API_PORT:-8080}:8080; chạy được khi đổi API_PORT.",
+        "DB không publish port host; connection host=db; depends_on condition:service_healthy + sqlcmd healthcheck hoạt động.",
+        "Không bind mount đường dẫn máy cá nhân, không cần local bin/obj; tránh container_name cố định gây collision (template có tên cố định).",
+        "/health 200 chỉ sau DB reachable+seed hoàn tất; API không trả healthy sớm; đáp ứng timeout health300s/build900s của grader.",
+        "Build và reset chỉ trên compose project riêng của bài; không dùng docker system prune -a như bước mặc định.",
+        "Ghi PowerShell run command hợp lệ, restart không nhân seed; reset volume riêng rồi up tự phục hồi."
+      ]
+    },
+    {
+      "key": "PACKAGE",
+      "title": "[Nộp bài] submission.json, README và ZIP sạch đúng tên",
+      "area": "delivery",
+      "phase": "M3 - Đóng gói và nghiệm thu",
+      "priority": "P1",
+      "deps": [
+        "SWAGGER",
+        "DOCKER"
+      ],
+      "scope": "submission.json, README.md, .dockerignore/.gitignore, script tạo ZIP dự kiến trong tools/",
+      "outcome": "Gói nộp định danh đúng, chứa đủ source/run contract và không mang dữ liệu thừa.",
+      "accept": [
+        "ZIP tên PRN232_LAB1_<StudentCode>_<FullNameNoSpaces>.zip; identity thật cần user cung cấp trước đóng gói, không dùng HE170123 mẫu.",
+        "Root có .sln,submission.json,README.md,docker-compose.yml,.dockerignore; Dockerfile root hoặc API; tối đa1 wrapper level.",
+        "Manifest đủ keys/paths/database/flags/knownIds; projectName khớp assembly; flags phản ánh implementation thật.",
+        "README tối đa1 trang có tên/MSSV, DB, một lệnh run, row counts, limitations.",
+        "Exclude bin/obj/.vs/node_modules, .git, instructor grader/samples, report nội bộ, DB backup/mdf/ldf/bak/bacpac và credentials thật.",
+        "ZIP chỉ đúng3 .csproj, không chứa test project; mở ZIP đọc manifest, source inventory và hash sau đóng gói.",
+        "6 penalty đều được kiểm; ghi mismatch tổng -2,25 của code so với -2,0 của tài liệu, không sửa grader."
+      ]
+    },
+    {
+      "key": "QA",
+      "title": "[Nghiệm thu] Full grader và kiểm tra phần grader bỏ sót",
+      "area": "verification",
+      "phase": "M3 - Đóng gói và nghiệm thu",
+      "priority": "P1",
+      "deps": [
+        "PACKAGE",
+        "SEARCH",
+        "SORT",
+        "PAGING",
+        "SELECT",
+        "EXPAND",
+        "SWAGGER",
+        "STUDENT",
+        "CATALOG",
+        "ENROLL",
+        "CRUD",
+        "DOCKER",
+        "BOOT"
+      ],
+      "scope": "tools/ hoặc qa/ scripts HTTP dự kiến, artifacts/evidence/ ngoài ZIP; instructor grader đọc-only",
+      "outcome": "Có bằng chứng trên ZIP cuối cùng cho cả rubric và toàn bộ yêu cầu chưa được grader kiểm sâu.",
+      "accept": [
+        "Dùng PowerShell7+; grader source/hash nguyên bản; full Grade-Lab1.ps1 trên thư mục riêng chỉ chứa ZIP bài, không chỉ Invoke-DynamicChecks hay -SkipDynamic.",
+        "Lưu command, exit code, revision, ZIP SHA256, runtime/port, report.md,raw.json,grader.log; không gọi PASS khi chưa chạy.",
+        "Đủ21 tiêu chí, static4/dynamic6, không penalty; xử lý report theo bằng chứng thay vì tổng điểm đơn lẻ.",
+        "Matrix5resource×5năng lực +10GET+3mutation; count/ID/related đúng DB, nested shape đúng, mọi400/404 giữ envelope.",
+        "Kiểm secondary sort, property set mọi row, unknown fields/expand, default/capped paging, combined query, put/delete persistence và restart/reset seed.",
+        "Phân biệt source bug với grader/PowerShell error-body bug; reproduce404 bằng raw HTTP trên pwsh7 trước quy kết screenshot.",
+        "Xác nhận raw tài liệu không bị thực thi ngoài workflow; sample mock/good skeleton không làm sản phẩm.",
+        "Nghiệm thu chạy lại trên đúng artifact sau sửa; không mở rộng sang auth/frontend/cloud deployment."
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "brief": "9c93f33b2468f425ccbfa60fcb6b53eff737f56fb719e59f3ffef10a4e9c5e68",
+    "guide": "234c311cd9255156f19826611677a1129ae3b15b41b865188519535240754cf8",
+    "grader": "b96bf36c6d1a6bef5615c66414b1093729e5004da5869a12eaa43222fab1a598"
+  },
+  "project": {
+    "number": 5,
+    "id": "PVT_kwHOCYWKSM4BkSkn",
+    "url": "https://github.com/users/danhnguyenthanh260/projects/5"
+  },
+  "requirements": [
+    {
+      "id": "A01",
+      "text": "Đúng ba project PRN232.LMS.API/Services/Repositories; projectName khớp",
+      "source": "B §1; G §1.3,2",
+      "owner": "ARCH",
+      "rubric": "ST-01",
+      "verification": "Đếm .csproj trong ZIP và build solution."
+    },
+    {
+      "id": "A02",
+      "text": "API gọi Services; Services gọi Repositories; API→Repositories chỉ đăng ký DI; không reference ngược",
+      "source": "G §2",
+      "owner": "ARCH",
+      "rubric": "ST-02",
+      "verification": "Đọc ProjectReference và chỗ dùng repository trong API."
+    },
+    {
+      "id": "A03",
+      "text": "Controller không chứa nghiệp vụ/truy cập dữ liệu hoặc token bị cấm",
+      "source": "B §1; G §2.1",
+      "owner": "ARCH",
+      "rubric": "ST-03",
+      "verification": "Đọc toàn bộ controller kể cả comment; service/repository thật."
+    },
+    {
+      "id": "A04",
+      "text": "Repository không chứa nghiệp vụ hoặc Request/Response/Dto",
+      "source": "B §1–2; G §2.2",
+      "owner": "ARCH",
+      "rubric": "ST-04",
+      "verification": "Review repository signatures và implementation."
+    },
+    {
+      "id": "A05",
+      "text": "Entity tại Repositories/Entities",
+      "source": "G §3",
+      "owner": "ARCH",
+      "rubric": "ST-05",
+      "verification": "Kiểm folder và mapping DB thực tế."
+    },
+    {
+      "id": "A06",
+      "text": "Business Model tại Services/BusinessModels",
+      "source": "G §3",
+      "owner": "ARCH",
+      "rubric": "ST-05",
+      "verification": "Kiểm model nghiệp vụ được dùng qua service."
+    },
+    {
+      "id": "A07",
+      "text": "Request Model tại API/RequestModels; Response Model tại API/ResponseModels",
+      "source": "G §3",
+      "owner": "ARCH",
+      "rubric": "ST-05",
+      "verification": "Đối chiếu action input/output và mapping."
+    },
+    {
+      "id": "A08",
+      "text": "Không trả Entity trực tiếp; Controllers không using *.Entities",
+      "source": "B §2; G §3",
+      "owner": "CONTRACT",
+      "rubric": "ST-06",
+      "verification": "Review type graph và JSON thực tế."
+    },
+    {
+      "id": "D01",
+      "text": "Semester: SemesterId int, SemesterName nvarchar(100), StartDate datetime, EndDate datetime",
+      "source": "B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "So EF mapping/migration và schema SQL."
+    },
+    {
+      "id": "D02",
+      "text": "Course: CourseId int, CourseName nvarchar(100), SemesterId int",
+      "source": "B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "So EF mapping và FK SemesterId."
+    },
+    {
+      "id": "D03",
+      "text": "Subject: SubjectId int, SubjectCode varchar(20), SubjectName nvarchar(100), Credit int",
+      "source": "B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "So schema; giữ Subject độc lập nếu chưa có quyết định thêm quan hệ."
+    },
+    {
+      "id": "D04",
+      "text": "Student: StudentId int, FullName nvarchar(100), Email varchar(100), DateOfBirth datetime",
+      "source": "B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "So schema/cột/length với migration."
+    },
+    {
+      "id": "D05",
+      "text": "Enrollment: EnrollmentId int, StudentId int, CourseId int, EnrollDate datetime, Status varchar(20)",
+      "source": "B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "So schema và FK Student/Course."
+    },
+    {
+      "id": "D06",
+      "text": "Dữ liệu có khóa/quan hệ hợp lệ, không bản ghi mồ côi",
+      "source": "Suy ra từ schema B p1",
+      "owner": "DB",
+      "rubric": "—",
+      "verification": "Join kiểm FK và đối chiếu nested detail với DB."
+    },
+    {
+      "id": "D07",
+      "text": "Seed ≥5 semesters,10 subjects,20 courses,50 students,500 enrollments",
+      "source": "B p1; G §7.3",
+      "owner": "BOOT",
+      "rubric": "DY-03",
+      "verification": "DB count thật và totalItems của cả5 resource."
+    },
+    {
+      "id": "D08",
+      "text": "Startup tự migrate/tạo schema, seed và retry DB 5–10 lần",
+      "source": "G §7.3",
+      "owner": "BOOT",
+      "rubric": "DY-01,DY-03",
+      "verification": "Up với DB rỗng, không lệnh migration thủ công."
+    },
+    {
+      "id": "D09",
+      "text": "Seed idempotent; knownIds có thật; reset stack riêng vẫn tự tạo lại",
+      "source": "G §1.3,7.3",
+      "owner": "BOOT",
+      "rubric": "DY-03,DY-05",
+      "verification": "So counts/IDs trước-sau restart và fresh volume."
+    },
+    {
+      "id": "E01",
+      "text": "GET list và /{id} cho semesters",
+      "source": "G §4",
+      "owner": "CATALOG",
+      "rubric": "ST-07,DY-03",
+      "verification": "200/list/detail; ID thiếu404; đủ5query features."
+    },
+    {
+      "id": "E02",
+      "text": "GET list và /{id} cho subjects",
+      "source": "G §4",
+      "owner": "CATALOG",
+      "rubric": "ST-07,DY-03",
+      "verification": "200/list/detail; ID thiếu404; expand theo schema."
+    },
+    {
+      "id": "E03",
+      "text": "GET list và /{id} cho courses",
+      "source": "G §4",
+      "owner": "CATALOG",
+      "rubric": "ST-07,DY-03",
+      "verification": "Detail có related đúng; list không expand mặc định."
+    },
+    {
+      "id": "E04",
+      "text": "GET list và /{id} cho students",
+      "source": "G §4,6.5",
+      "owner": "STUDENT",
+      "rubric": "ST-07,DY-05,DY-06",
+      "verification": "Known student có enrollments; missing404."
+    },
+    {
+      "id": "E05",
+      "text": "GET list và /{id} cho enrollments",
+      "source": "G §4,6.5",
+      "owner": "ENROLL",
+      "rubric": "ST-07,DY-03",
+      "verification": "Detail có student/course khớp FK; missing404."
+    },
+    {
+      "id": "E06",
+      "text": "Routes /api/<plural>, lowercase, không verbs/trailing-slash/version segment; controller plural",
+      "source": "G §4",
+      "owner": "ARCH",
+      "rubric": "ST-07",
+      "verification": "Kiểm cả route template và OpenAPI actual path."
+    },
+    {
+      "id": "E07",
+      "text": "GET-by-id trả related data đầy đủ theo schema, không cắt mẫu5record",
+      "source": "B §4; G §6.5",
+      "owner": "STUDENT",
+      "rubric": "DY-05",
+      "verification": "Kiểm10 detail success/missing của5resource; compare DB."
+    },
+    {
+      "id": "E08",
+      "text": "Không vòng lặp hay $id/$ref/$values; nested response hữu hạn",
+      "source": "G §6.5",
+      "owner": "EXPAND",
+      "rubric": "DY-05",
+      "verification": "Inspect payload mọi detail/expand, depth và size."
+    },
+    {
+      "id": "E09",
+      "text": "POST students tạo thật,201+Location; GET Location thấy dữ liệu",
+      "source": "G §4,6.4",
+      "owner": "CRUD",
+      "rubric": "DY-12",
+      "verification": "Lifecycle trên record mới; kiểm DB persistence."
+    },
+    {
+      "id": "E10",
+      "text": "PUT students/{id} cập nhật thật,200; missing404",
+      "source": "G §4,6.4",
+      "owner": "CRUD",
+      "rubric": "—",
+      "verification": "GET trước/sau PUT; invalid body400."
+    },
+    {
+      "id": "E11",
+      "text": "DELETE students/{id} xóa thật,200; missing404; FK policy rõ",
+      "source": "G §4,6.4; FK policy là thiết kế",
+      "owner": "CRUD",
+      "rubric": "—",
+      "verification": "DELETE rồi GET404; test student có enrollment theo quyết định."
+    },
+    {
+      "id": "Q01",
+      "text": "Search contains không phân biệt hoa thường trên main text fields của cả5resource",
+      "source": "G §5",
+      "owner": "SEARCH",
+      "rubric": "DY-09",
+      "verification": "Matrix5resource matching/nonmatching/mixed case."
+    },
+    {
+      "id": "Q02",
+      "text": "Sort tăng/giảm và comma-separated nhiều field; - biểu thị giảm",
+      "source": "G §5",
+      "owner": "SORT",
+      "rubric": "DY-08",
+      "verification": "Ties primary, secondary date, numeric sort và mixed directions."
+    },
+    {
+      "id": "Q03",
+      "text": "Query tên chính xác search,sort,page,size,fields,expand; JSON field camelCase",
+      "source": "G §5",
+      "owner": "QUERY",
+      "rubric": "DY-07..DY-11",
+      "verification": "Kiểm binding/OpenAPI và response casing."
+    },
+    {
+      "id": "Q04",
+      "text": "Page 1-based, default page=1,size=10",
+      "source": "G §5",
+      "owner": "PAGING",
+      "rubric": "DY-07",
+      "verification": "Omit params, so default và explicit values trên5resource."
+    },
+    {
+      "id": "Q05",
+      "text": "Size tối đa100; hành vi >100 cần quyết định nhất quán",
+      "source": "G §5; mock khác cách diễn giải",
+      "owner": "PAGING",
+      "rubric": "—",
+      "verification": "Thử100/101, đối chiếu decision log và metadata."
+    },
+    {
+      "id": "Q06",
+      "text": "page=0 và size=-1 trả400; sai kiểu không gây500",
+      "source": "G §5",
+      "owner": "QUERY",
+      "rubric": "DY-07",
+      "verification": "Kiểm từng tham số riêng và combined invalid."
+    },
+    {
+      "id": "Q07",
+      "text": "Paging đúng số lượng, khác trang, thứ tự ổn định",
+      "source": "G §5; stability là hệ quả paging",
+      "owner": "PAGING",
+      "rubric": "DY-07",
+      "verification": "Compare IDs2page và page cuối."
+    },
+    {
+      "id": "Q08",
+      "text": "totalItems sau filter trước paging; totalPages=ceil(totalItems/pageSize)",
+      "source": "G §6.2; ý nghĩa metadata",
+      "owner": "PAGING",
+      "rubric": "DY-07",
+      "verification": "Count DB filtered; empty/page beyond cuối."
+    },
+    {
+      "id": "Q09",
+      "text": "fields trả đúng property set trên mọi item",
+      "source": "G §5",
+      "owner": "SELECT",
+      "rubric": "DY-10",
+      "verification": "Set equality mọi row trong5resource, không chỉ row0."
+    },
+    {
+      "id": "Q10",
+      "text": "fields không bỏ pagination/envelope ở root",
+      "source": "G §5–6",
+      "owner": "SELECT",
+      "rubric": "DY-04",
+      "verification": "Kiểm root sau selection và empty result."
+    },
+    {
+      "id": "Q11",
+      "text": "expand chỉ thêm related objects được yêu cầu; không expand thì absent/null",
+      "source": "G §5",
+      "owner": "EXPAND",
+      "rubric": "DY-11",
+      "verification": "Expanded→plain→expanded để phát hiện state leak."
+    },
+    {
+      "id": "Q12",
+      "text": "enrollments expand=student,course có đủ2object đúng FK",
+      "source": "G §5",
+      "owner": "EXPAND",
+      "rubric": "DY-11",
+      "verification": "So mọi returned row với student/course endpoint."
+    },
+    {
+      "id": "Q13",
+      "text": "sort/fields/expand lạ trả400 và envelope lỗi",
+      "source": "G §5",
+      "owner": "QUERY",
+      "rubric": "DY-08; DY-10 chỉ ghi nhận",
+      "verification": "Ba request riêng + query trên empty collection."
+    },
+    {
+      "id": "Q14",
+      "text": "Combined search/sort/page/size/fields/expand hoạt động",
+      "source": "B §5; G §5",
+      "owner": "ENROLL",
+      "rubric": "—",
+      "verification": "Chạy nguyên URL ví dụ với semantics được chốt."
+    },
+    {
+      "id": "Q15",
+      "text": "fields+expand: exact-key rule và ví dụ mâu thuẫn cần quyết định",
+      "source": "G §5 example + rule4",
+      "owner": "QUERY",
+      "rubric": "—",
+      "verification": "Ghi câu trả lời giảng viên hoặc proposal rõ ràng trước acceptance tổ hợp."
+    },
+    {
+      "id": "Q16",
+      "text": "Expand cho Subject không có FK; relation allowlist cho mỗi resource cần ghi",
+      "source": "B p1; G §5",
+      "owner": "QUERY",
+      "rubric": "—",
+      "verification": "Đối chiếu schema, không tự coi quan hệ thêm là đề yêu cầu."
+    },
+    {
+      "id": "R01",
+      "text": "Envelope success,message,data,errors thống nhất mọi API nghiệp vụ",
+      "source": "G §6.1",
+      "owner": "CONTRACT",
+      "rubric": "DY-04",
+      "verification": "Check key+type+meaning, list/detail/mutation/error."
+    },
+    {
+      "id": "R02",
+      "text": "Collection data là array; pagination ở root với đủ4key",
+      "source": "G §6.2",
+      "owner": "CONTRACT",
+      "rubric": "DY-04,DY-07",
+      "verification": "Reject data.items/pagination lồng mặc dù helper có thể chấp nhận."
+    },
+    {
+      "id": "R03",
+      "text": "Error success=false,data=null,errors array; 404 resource không tồn tại",
+      "source": "G §6.3–6.5",
+      "owner": "CONTRACT",
+      "rubric": "DY-06",
+      "verification": "GET5missing IDs; body thật không rỗng/ProblemDetails."
+    },
+    {
+      "id": "R04",
+      "text": "GET/PUT/DELETE200, POST201+Location, invalid400,missing404, unexpected500",
+      "source": "G §6.4",
+      "owner": "CONTRACT",
+      "rubric": "DY-05,DY-06,DY-12",
+      "verification": "Status matrix và full envelope; không dùng DELETE204."
+    },
+    {
+      "id": "R05",
+      "text": "Input cơ bản fullName rỗng/email sai phải400, không500",
+      "source": "G §6.4; DynamicChecks L403–405",
+      "owner": "CRUD",
+      "rubric": "DY-12",
+      "verification": "Invalid POST/PUT/body malformed; không nâng thành validation framework bắt buộc."
+    },
+    {
+      "id": "R06",
+      "text": "JSON camelCase; không config serialization làm mất null keys required",
+      "source": "G §5 rule5; §6",
+      "owner": "CONTRACT",
+      "rubric": "DY-04",
+      "verification": "So exact casing/keys trên success/error/selection."
+    },
+    {
+      "id": "K01",
+      "text": "API và DB đều trong Docker; single command up --build -d",
+      "source": "B §7; G §7",
+      "owner": "DOCKER",
+      "rubric": "DY-01",
+      "verification": "Build trên context sạch không local build artifacts."
+    },
+    {
+      "id": "K02",
+      "text": "Services chính xác api và db",
+      "source": "G §7.1",
+      "owner": "DOCKER",
+      "rubric": "ST-08",
+      "verification": "docker compose config và runtime services."
+    },
+    {
+      "id": "K03",
+      "text": "Container API listen8080, host ${API_PORT:-8080}:8080",
+      "source": "G §7.1",
+      "owner": "DOCKER",
+      "rubric": "ST-08,DY-01",
+      "verification": "Default port và remapped free port đều health200."
+    },
+    {
+      "id": "K04",
+      "text": "DB không publish host port; connection host db, không localhost",
+      "source": "G §7.1",
+      "owner": "DOCKER",
+      "rubric": "ST-08",
+      "verification": "Compose config+network test API→DB."
+    },
+    {
+      "id": "K05",
+      "text": "depends_on service_healthy và DB healthcheck thực sự chạy",
+      "source": "G §7.1",
+      "owner": "DOCKER",
+      "rubric": "ST-08,DY-01",
+      "verification": "DB warming-up có logs, không chỉ token healthcheck."
+    },
+    {
+      "id": "K06",
+      "text": "Không bind mount máy cá nhân hoặc phụ thuộc file ngoài clone",
+      "source": "G §7.1–7.2",
+      "owner": "DOCKER",
+      "rubric": "—",
+      "verification": "Clean clone/build context và compose config."
+    },
+    {
+      "id": "K07",
+      "text": "Dockerfile multistage sdk→aspnet,EXPOSE8080,ENTRYPOINT đúng DLL",
+      "source": "G §7.2",
+      "owner": "DOCKER",
+      "rubric": "ST-08 kiểm tồn tại",
+      "verification": "Review Dockerfile và inspect/running container."
+    },
+    {
+      "id": "K08",
+      "text": "/health200 chỉ khi DB reachable và seed xong; deadline health300s",
+      "source": "G §7.4; rubric.settings",
+      "owner": "DOCKER",
+      "rubric": "DY-01",
+      "verification": "Early startup không200, DB mất kết nối phản ánh readiness."
+    },
+    {
+      "id": "K09",
+      "text": "Fresh volume/restart hoạt động; startup không manual steps",
+      "source": "G §7.3",
+      "owner": "BOOT",
+      "rubric": "DY-01,DY-03",
+      "verification": "Isolated down/up, count trước-sau; không xóa global resources."
+    },
+    {
+      "id": "K10",
+      "text": "Tránh fixed container_name trong template gây collision",
+      "source": "Template compose; đề xuất vận hành",
+      "owner": "DOCKER",
+      "rubric": "—",
+      "verification": "Chạy compose project riêng và kiểm generated names."
+    },
+    {
+      "id": "W01",
+      "text": "Swagger UI /swagger và OpenAPI /swagger/v1/swagger.json",
+      "source": "B §8; G §8",
+      "owner": "SWAGGER",
+      "rubric": "ST-09,DY-02",
+      "verification": "GET UI/spec200 và document đúng OpenAPI."
+    },
+    {
+      "id": "W02",
+      "text": "Swagger enabled trong container, đúng environment",
+      "source": "G §8",
+      "owner": "SWAGGER",
+      "rubric": "DY-02",
+      "verification": "Chạy container artifact, không lấy IDE làm bằng chứng."
+    },
+    {
+      "id": "W03",
+      "text": "Document endpoints,input/output,status; ProducesResponseType phù hợp",
+      "source": "B §8; G §8",
+      "owner": "SWAGGER",
+      "rubric": "DY-02 kiểm paths",
+      "verification": "So đủ13operations và schema/status với actual HTTP."
+    },
+    {
+      "id": "W04",
+      "text": "Hiện đủ6query parameters và API testing qua UI",
+      "source": "B §8; G §8",
+      "owner": "SWAGGER",
+      "rubric": "—",
+      "verification": "Try it out và inspect OpenAPI parameters."
+    },
+    {
+      "id": "P01",
+      "text": "Một ZIP không password, đúng tên/MSSV/fullname không dấu và khoảng trắng",
+      "source": "G §1.1",
+      "owner": "PACKAGE",
+      "rubric": "PEN-NAMING",
+      "verification": "Regex code2letters+6digits; metadata user thật; không dùng placeholder."
+    },
+    {
+      "id": "P02",
+      "text": "ZIP root đúng solution; tối đa1wrapper folder",
+      "source": "G §1.2",
+      "owner": "PACKAGE",
+      "rubric": "—",
+      "verification": "Inventory ZIP trước khi chạy grader."
+    },
+    {
+      "id": "P03",
+      "text": "Có submission.json,README,.sln,compose,.dockerignore; Dockerfile root hoặc API",
+      "source": "G §1.2,7.2",
+      "owner": "PACKAGE",
+      "rubric": "PEN-MANIFEST,PEN-README,ST-08",
+      "verification": "Readback file list và Dockerfile build path."
+    },
+    {
+      "id": "P04",
+      "text": "submission.json đủ identity/project/paths/database/resources/implemented/knownIds; notes optional",
+      "source": "G §1.3",
+      "owner": "PACKAGE",
+      "rubric": "PEN-MANIFEST",
+      "verification": "Parse JSON; khớp actual paths/assembly/seed, không sửa truth bằng flags."
+    },
+    {
+      "id": "P05",
+      "text": "implemented=false tự loại điểm feature tương ứng; true phải hoạt động",
+      "source": "G §1.3; script chỉ dùng6feature+create",
+      "owner": "PACKAGE",
+      "rubric": "DY-07..DY-12",
+      "verification": "Flags thật; update/delete vẫn phải làm dù grader chưa dùng flags đó."
+    },
+    {
+      "id": "P06",
+      "text": "README tối đa1trang: identity,DB,run command,seed counts,known limitations",
+      "source": "G §1.4",
+      "owner": "PACKAGE",
+      "rubric": "PEN-README kiểm tồn tại",
+      "verification": "Review đủ nội dung và PowerShell syntax hợp lệ."
+    },
+    {
+      "id": "P07",
+      "text": "Không bin/obj/.vs/node_modules trong ZIP",
+      "source": "G §1.5",
+      "owner": "PACKAGE",
+      "rubric": "PEN-BINOBJ",
+      "verification": "Scan archive paths."
+    },
+    {
+      "id": "P08",
+      "text": "Không DB backup .mdf/.ldf/.bak/.bacpac; seed bằng code",
+      "source": "G §1.5; StaticChecks L312–314",
+      "owner": "PACKAGE",
+      "rubric": "PEN-DBFILE",
+      "verification": "Scan archive extension và chạy fresh DB."
+    },
+    {
+      "id": "P09",
+      "text": "Không secrets thật/cloud connection/API keys",
+      "source": "G §1.5",
+      "owner": "PACKAGE",
+      "rubric": "PEN-SECRET",
+      "verification": "Review all staged/ZIP config, không chỉ appsettings regex."
+    },
+    {
+      "id": "P10",
+      "text": "Chấm full ZIP cuối cùng, giữ report/raw/log đúng artifact",
+      "source": "G §9–10",
+      "owner": "QA",
+      "rubric": "ST-01..ST-09,DY-01..DY-12",
+      "verification": "Record SHA256+revision+command+exit+reports; no Resume stale report."
+    },
+    {
+      "id": "P11",
+      "text": "Penalty docs −2,0 so với rubric/code −2,25 phải ghi rõ",
+      "source": "G §11; rubric; Report L32–33",
+      "owner": "TRACK",
+      "rubric": "6 penalties",
+      "verification": "Tính tổng rubric và xác minh không cap penalty riêng."
+    },
+    {
+      "id": "X01",
+      "text": "Không yêu cầu Authentication/Authorization/JWT",
+      "source": "B §10",
+      "owner": "TRACK",
+      "rubric": "Ngoài phạm vi",
+      "verification": "Backlog không có auth/login/security feature ngoài bài."
+    },
+    {
+      "id": "X02",
+      "text": "Không yêu cầu Advanced Validation/Global Exception Handling framework",
+      "source": "B §10",
+      "owner": "TRACK",
+      "rubric": "Ngoài phạm vi",
+      "verification": "Vẫn giữ basic400/error contract, không thêm scope framework."
+    },
+    {
+      "id": "X03",
+      "text": "Không yêu cầu unit/integration test suite",
+      "source": "B §10",
+      "owner": "QA",
+      "rubric": "Ngoài phạm vi framework",
+      "verification": "HTTP/manual contract verification vẫn cần cho nghiệm thu."
+    },
+    {
+      "id": "X04",
+      "text": "Không frontend, cloud deployment hoặc CRUD thêm cho mọiresource thành bắt buộc",
+      "source": "B assignment; G §4,7; phân tích scope",
+      "owner": "TRACK",
+      "rubric": "Giới hạn phạm vi",
+      "verification": "Chỉ13operations nghiệp vụ+health+Swagger được yêu cầu."
+    }
+  ],
+  "rubric": [
+    {
+      "id": "ST-01",
+      "points": 0.5,
+      "owner": "ARCH",
+      "gap": "Nhận diện suffix project, không chứng minh exactly3 hoặc tên project đồng nhất"
+    },
+    {
+      "id": "ST-02",
+      "points": 0.5,
+      "owner": "ARCH",
+      "gap": "Kiểm references cần thiết và upward ref; không enforce mọi ref bị cấm hay DI-only"
+    },
+    {
+      "id": "ST-03",
+      "points": 0.5,
+      "owner": "ARCH",
+      "gap": "Regex raw source; partial credit, false positive trong comment; không semantic business logic"
+    },
+    {
+      "id": "ST-04",
+      "points": 0.25,
+      "owner": "ARCH",
+      "gap": "Regex Request/Response/Dto; không chứng minh repository không có nghiệp vụ"
+    },
+    {
+      "id": "ST-05",
+      "points": 0.5,
+      "owner": "ARCH",
+      "gap": "Folder hoặc suffix presence; không chứng minh dùng model đúng luồng"
+    },
+    {
+      "id": "ST-06",
+      "points": 0.5,
+      "owner": "CONTRACT",
+      "gap": "Chỉ detect using *.Entities/Entity; không đầy đủ entity-leak proof"
+    },
+    {
+      "id": "ST-07",
+      "points": 0.5,
+      "owner": "ARCH",
+      "gap": "Route regex; không verify mọi path/method/casing runtime"
+    },
+    {
+      "id": "ST-08",
+      "points": 0.5,
+      "owner": "DOCKER",
+      "gap": "Dockerfile presence + compose regex; không đầy đủ multistage/readiness/bind mount validation"
+    },
+    {
+      "id": "ST-09",
+      "points": 0.25,
+      "owner": "SWAGGER",
+      "gap": "Package/token wiring; không verify schema/status annotations"
+    },
+    {
+      "id": "DY-01",
+      "points": 0.75,
+      "owner": "DOCKER",
+      "gap": "Health fallback /healthz,Swagger,students cho60%; bất kỳ2xx trên health được coi strict"
+    },
+    {
+      "id": "DY-02",
+      "points": 0.5,
+      "owner": "SWAGGER",
+      "gap": "Spec marker/resource-prefix paths+UI marker; không đủ13operations hoặc schema correctness"
+    },
+    {
+      "id": "DY-03",
+      "points": 0.25,
+      "owner": "BOOT",
+      "gap": "Tin totalItems 5resources; không query DB/relationships/idempotency"
+    },
+    {
+      "id": "DY-04",
+      "points": 0.5,
+      "owner": "CONTRACT",
+      "gap": "4sample envelopes + student pagination key presence; case-insensitive, không types/meaning"
+    },
+    {
+      "id": "DY-05",
+      "points": 0.5,
+      "owner": "STUDENT",
+      "gap": "Chỉ student knownId, nested bất kỳ; depth sample tối đa5elements, không complete related data"
+    },
+    {
+      "id": "DY-06",
+      "points": 0.25,
+      "owner": "CONTRACT",
+      "gap": "Student999999404(70%)+success=false(30%); không đủ error contract; phụ thuộc error-body reader"
+    },
+    {
+      "id": "DY-07",
+      "points": 0.75,
+      "owner": "PAGING",
+      "gap": "Students size5,page1/2; chỉ compare first item; combined invalid, không default/cap/other resources"
+    },
+    {
+      "id": "DY-08",
+      "points": 0.75,
+      "owner": "SORT",
+      "gap": "Students fullName asc/desc; multi chỉ primary; invalid sort; null values có thể bị bỏ"
+    },
+    {
+      "id": "DY-09",
+      "points": 0.5,
+      "owner": "SEARCH",
+      "gap": "Students token lấy từ fullName, matches trong toàn JSON; không complete field/case semantics"
+    },
+    {
+      "id": "DY-10",
+      "points": 0.5,
+      "owner": "SELECT",
+      "gap": "Student row0 property set case-insensitive; unknown fields chỉ ghi warning500, không trừ điểm"
+    },
+    {
+      "id": "DY-11",
+      "points": 0.5,
+      "owner": "EXPAND",
+      "gap": "Enrollment row0 và2relations; no invalid expand/otherresources/combined fields check"
+    },
+    {
+      "id": "DY-12",
+      "points": 0.25,
+      "owner": "CRUD",
+      "gap": "Chỉ POST201+Location và invalidPOST400; không PUT/DELETE/GET-persistence"
+    }
+  ],
+  "penalties": [
+    {
+      "id": "PEN-MANIFEST",
+      "points": -0.25,
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "PEN-README",
+      "points": -0.25,
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "PEN-BINOBJ",
+      "points": -0.25,
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "PEN-NAMING",
+      "points": -0.5,
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "PEN-DBFILE",
+      "points": -0.5,
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "PEN-SECRET",
+      "points": -0.5,
+      "owner": "PACKAGE"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC-01",
+      "status": "Cần xác nhận với giảng viên",
+      "topic": "fields kết hợp expand",
+      "evidence": "G §5 vừa yêu cầu exact property set vừa dùng fields=enrollmentId,status&expand=student,course.",
+      "proposal": "Selection quyết định property set cuối cùng. Expand chỉ hiển thị nếu relation nằm trong fields; xác nhận cách xử lý ví dụ trước nghiệm thu.",
+      "owner": "QUERY"
+    },
+    {
+      "id": "DEC-02",
+      "status": "Đề xuất thiết kế",
+      "topic": "Subject độc lập và relation allowlist",
+      "evidence": "B p1 không có SubjectId trên Course hoặc bảng liên kết khác, trong khi mọi list cần expansion.",
+      "proposal": "Giữ schema gốc, Subject hỗ trợ không expand và trả400 cho relation lạ; không tạo quan hệ mới chỉ để đủ feature. Xác nhận nếu giảng viên muốn Course–Subject.",
+      "owner": "QUERY"
+    },
+    {
+      "id": "DEC-03",
+      "status": "Đề xuất thiết kế",
+      "topic": "size vượt100",
+      "evidence": "G §5 ghi capped at100; mock_api.py trả400 khi size>100; dynamic grader không test.",
+      "proposal": "Clamp size>100 xuống100 và metadata dùng effective size; đổi nếu giảng viên yêu cầu400.",
+      "owner": "PAGING"
+    },
+    {
+      "id": "DEC-04",
+      "status": "Cần chốt khi triển khai",
+      "topic": "Xóa Student có enrollments",
+      "evidence": "G yêu cầu DELETE200 nhưng không quy định cascade/restrict, schema có FK.",
+      "proposal": "Xóa enrollment thuộc student và student trong transaction để không mồ côi; chỉ QA trên dữ liệu thử.",
+      "owner": "CRUD"
+    },
+    {
+      "id": "DEC-05",
+      "status": "Chưa có thông tin",
+      "topic": "MSSV, họ tên, lớp, hạn nộp",
+      "evidence": "Tài liệu chỉ có HE170123/Nguyen Van An/SE1701 mẫu.",
+      "proposal": "Không đặt assignee/deadline giả. Thu thập identity thật trước tạo submission.json/ZIP cuối.",
+      "owner": "PACKAGE"
+    },
+    {
+      "id": "DEC-06",
+      "status": "Cần chọn khi triển khai",
+      "topic": "Phiên bản .NET/EF và DB",
+      "evidence": "B bắt buộc ASP.NET Core và Docker; phụ lục/template dùng SQL Server2022; README grader gợi ý .NET8, không là version pin của đề.",
+      "proposal": "Baseline SQL Server2022; chọn một .NET SDK/EF/container version phù hợp môi trường môn học và khóa thống nhất ở issue nền tảng.",
+      "owner": "ARCH"
+    },
+    {
+      "id": "DEC-07",
+      "status": "Sai lệch nguồn đã xác minh",
+      "topic": "Tổng penalty",
+      "evidence": "G §11/README ghi tối đa−2,0; rubric6penalties tổng−2,25; Report.ps1 chỉ clamp final0..10.",
+      "proposal": "Tránh cả6penalties, ghi discrepancy nếu cần hỏi điểm; giữ grader nguyên bản.",
+      "owner": "TRACK"
+    },
+    {
+      "id": "DEC-08",
+      "status": "Cần kiểm khi chạy grader",
+      "topic": "Screenshot404/DY-04 thấp và mock",
+      "evidence": "Screenshot gọi giống README self-test trên8099; Common.ps1 dùng nhánh error-body khác PS5/PS7; mock404 có envelope; mock expand mutate shared rows.",
+      "proposal": "Không coi screenshot là kết quả bài sinh viên. So raw404 trên pwsh7 trước quy lỗi API; DY-11=80% phù hợp intentional leak trong mock.",
+      "owner": "QA"
+    },
+    {
+      "id": "DEC-09",
+      "status": "Sai lệch tài liệu đã giải quyết",
+      "topic": "Vị trí Dockerfile",
+      "evidence": "G §0 nói root, nhưng §1.2 cho phép API/Dockerfile hoặc root; grader tìm recursively.",
+      "proposal": "Chọn API/Dockerfile và compose dockerfile path đúng, theo hướng dẫn chi tiết.",
+      "owner": "DOCKER"
+    },
+    {
+      "id": "DEC-10",
+      "status": "Đề xuất giới hạn",
+      "topic": "Health/Swagger và yêu cầu mọi response có envelope",
+      "evidence": "G §6 nói mọi response; OpenAPI/Swagger có format chuẩn; grader health chỉ kiểm2xx, mock health object riêng.",
+      "proposal": "Envelope cho API nghiệp vụ và error; health200 có thể dùng envelope, Swagger HTML/OpenAPI giữ định dạng tiêu chuẩn.",
+      "owner": "CONTRACT"
+    }
+  ]
+}

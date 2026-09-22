@@ -1,0 +1,78 @@
+{
+  "TRACK": {
+    "number": 1,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/1"
+  },
+  "ARCH": {
+    "number": 2,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/2"
+  },
+  "DB": {
+    "number": 3,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/3"
+  },
+  "BOOT": {
+    "number": 4,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/4"
+  },
+  "CONTRACT": {
+    "number": 5,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/5"
+  },
+  "QUERY": {
+    "number": 6,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/6"
+  },
+  "STUDENT": {
+    "number": 7,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/7"
+  },
+  "CATALOG": {
+    "number": 8,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/8"
+  },
+  "ENROLL": {
+    "number": 9,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/9"
+  },
+  "SEARCH": {
+    "number": 10,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/10"
+  },
+  "SORT": {
+    "number": 11,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/11"
+  },
+  "PAGING": {
+    "number": 12,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/12"
+  },
+  "SELECT": {
+    "number": 13,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/13"
+  },
+  "EXPAND": {
+    "number": 14,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/14"
+  },
+  "CRUD": {
+    "number": 15,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/15"
+  },
+  "SWAGGER": {
+    "number": 16,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/16"
+  },
+  "DOCKER": {
+    "number": 17,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/17"
+  },
+  "PACKAGE": {
+    "number": 18,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/18"
+  },
+  "QA": {
+    "number": 19,
+    "url": "https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/19"
+  }
+}

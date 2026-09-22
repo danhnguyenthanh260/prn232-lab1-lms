@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+node_modules/
+artifacts/
+sources/local/
+tools/publication/
+__pycache__/
+*.pyc
+*.zip
+*.bak
+*.mdf
+*.ldf
+*.bacpac
+.env
+!.env.example

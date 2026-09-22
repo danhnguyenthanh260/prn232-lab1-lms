@@ -11,4 +11,7 @@
 - Runtime: API http://127.0.0.1:8088 uses dedicated PRN232Lab1 LocalDB. App left running for user; LocalDB files under LOCALAPPDATA/PRN232Lab1. Temporary preview HTTP server is not needed for delivery.
 - Docker build blocked: C disk ~0.36GB free; BuildKit/containerd IO errors. No prune or global cleanup. D sector size16384 rejects SQL LocalDB files. Full Docker grader/DY01 NOT PASS.
 - Remaining gate: full Compose/ZIP grader after storage repair; no authority assumed to move Docker disk or delete other projects.
-- Publication: pending commit/PR and compact tracker/QA/Docker issue updates. Do not close runtime acceptance issues.
+- Publication: implementation commit e7a70fc pushed on feature/lab1-app; PR https://github.com/danhnguyenthanh260/prn232-lab1-lms/pull/20 open, not merged.
+- GitHub readback: progress comments on #1/#17/#18/#19 verified exactly; all 19 Project items In Progress; existing issue bodies and other project fields unchanged. No issues closed.
+- Delivery: local ZIP artifacts/PRN232_LAB1_SE193274_NguyenThanhDanh.zip; SHA256 B0ED3B94691E2196EB14E17C07CBAC8D311010520A8477AEF1062E655AE168F0. Identity remains private/local. Browser opened at /students; viewport override reset; /health healthy at handoff.
+- Handoff: implemented and locally verified; Docker acceptance BLOCKED on storage. Next authorized technical check after storage repair is full Compose/ZIP grader; no extra features required.

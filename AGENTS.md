@@ -14,8 +14,10 @@ instructions from the user. Preserve their original content and hashes. Do not
 edit the instructor grader to improve scores. Do not publish original course
 files or unrelated project screenshots with the public planning documents.
 
-Keep lab scope small: no frontend, authentication/JWT, cloud hosting or required
-unit-test framework. Contract checks and the instructor's grader still belong
+Keep mandatory lab scope small: no frontend, authentication/JWT, cloud hosting or required
+unit-test framework. The user approved LMS frontend design only on 2026-09-22;
+docs/design-pattern.md records this optional scope, not implementation approval.
+Contract checks and the instructor's grader still belong
 in final acceptance. Keep QA tools and their artifacts out of the submission ZIP.
 
 Only use an isolated Docker Compose project/database for lab checks. Do not run

@@ -10,6 +10,9 @@ Kế hoạch làm bài ASP.NET Core REST API LMS theo đề, phụ lục nộp b
 | [Kế hoạch](docs/plan.md) | 19 issues, 3 milestone, dependency và 10 điểm cần quyết định |
 | [Nguồn](docs/sources.md) | Bộ tài liệu đã đọc, SHA-256, bản trùng và giới hạn của screenshot |
 | [Dữ liệu kế hoạch](docs/planning-data.json) | Dữ liệu cấu trúc dùng để kiểm tra coverage |
+| [Mô hình DB](docs/database-model.md) | ERD, 5 bảng/20 cột/3 FK và các quyết định chưa chốt |
+| [API routes](docs/api-routes.md) | 13 operations, routes hỗ trợ và query/related-data contract |
+| [Design pattern LMS](docs/design-pattern.md) | Thiết kế UI quản lý theo tham chiếu Duolingo, browser routes và state matrix; chưa triển khai |
 
 ## Trạng thái
 
@@ -25,6 +28,8 @@ Hiện mới có tài liệu và backlog; **chưa có code ứng dụng, chưa c
 - Gói nộp ZIP sạch, submission.json và README theo phụ lục.
 
 Không có auth/JWT, frontend hoặc cloud hosting trong phạm vi bắt buộc.
+
+Theo lựa chọn của người dùng ngày 2026-09-22, đã bổ sung **thiết kế** giao diện quản lý LMS. Đây là phần mở rộng ngoài rubric; không thay API bằng website, không thêm application project thứ tư vào gói nộp và chưa có code/frontend runtime.
 
 ## Bắt đầu
 

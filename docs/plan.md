@@ -10,6 +10,8 @@ API chịu trách nhiệm HTTP/request/response; Services xử lý validation v�
 
 Tài liệu/issue paths là **dự kiến**, do repo chưa có source ứng dụng. Mỗi issue phải xác minh path và SDK thực tế trước khi sửa.
 
+Mô hình chi tiết: [ERD và dữ liệu](database-model.md), [API routes/query contract](api-routes.md). Người dùng chọn thiết kế [giao diện quản lý LMS](design-pattern.md) theo tham chiếu Duolingo ngày 2026-09-22; phần này là thiết kế mở rộng ngoài rubric, chưa yêu cầu triển khai frontend. Giữ 19 issue bắt buộc và scope 3 application projects; brief UI được liên kết tại tracker #1.
+
 ## Công việc và phụ thuộc
 
 | Key | Công việc | Milestone | Priority | Blocked by |

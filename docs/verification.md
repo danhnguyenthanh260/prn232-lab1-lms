@@ -19,3 +19,13 @@
 `python tools/validate_plan.py` trả exit code 0. Lệnh chỉ xác minh dữ liệu kế hoạch, ánh xạ issue, trọng số, dependency và liên kết local.
 
 Baseline kế hoạch được push tại commit `2330122`; checkpoint tiếp theo chỉ ghi lại kết quả xác minh. Coverage ứng dụng sẽ được cập nhật bằng bằng chứng khi các issue được thực hiện.
+
+## Bổ sung mô hình và thiết kế LMS
+
+- Đã cập nhật và đọc lại chính xác body của 11 issues: #1, #3, #6, #7, #8, #9, #14, #15, #16, #17, #19. Nội dung gốc, acceptance, labels, milestone, assignees và trạng thái được giữ; không đóng issue.
+- Kiểm tra lại dependency của các issue sửa, 18 quan hệ sub-issue và toàn bộ membership/fields của 19 Project items: không đổi, vẫn Todo.
+- Heading bổ sung được GitHub render thành HTML hợp lệ. Chưa kiểm hiển thị sơ đồ Mermaid bằng ảnh trình duyệt; không coi đây là visual QA.
+- Validator đã mở rộng, exit 0: 13 API operations khớp matrix; ERD có 5 bảng/20 cột/5 PK/3 FK; coverage 79/79 và rubric không đổi; local Markdown links hợp lệ.
+- Brief LMS gồm browser routes, pattern list/detail/form, tokens sửa contrast, field-purpose mapping, responsive/state/keyboard plan và giới hạn API. Đây là design review, không phải kết quả UI runtime.
+- Snapshot và readback chi tiết lưu local trong `tools/publication/model-update-receipt.json` (ignored). Không rerun publisher baseline để ghi đè phần bổ sung trên GitHub.
+- Build, DB, Docker, grader và frontend rendered checks: **NOT RUN**, chưa có ứng dụng.

@@ -53,4 +53,17 @@ for path in [ROOT / 'README.md', *sorted((ROOT / 'docs').glob('*.md'))]:
         assert (path.parent / target.split('#')[0]).exists(), (path, target)
 
 print('PASS: 19 issue definitions, 79 requirement mappings, 21 rubric criteria (4+6), 6 penalties (-2.25), acyclic dependencies and local links.')
+routes = (ROOT / 'docs/api-routes.md').read_text(encoding='utf-8')
+operations = re.findall(r'^\| (GET|POST|PUT|DELETE) \| (/api/[^ |]+) \|', routes, re.M)
+expected = [('GET', '/api/' + name + suffix) for name in ['semesters', 'subjects', 'courses', 'students', 'enrollments'] for suffix in ['', '/{id}']]
+expected += [('POST', '/api/students'), ('PUT', '/api/students/{id}'), ('DELETE', '/api/students/{id}')]
+assert len(operations) == 13 and set(operations) == set(expected)
+db = (ROOT / 'docs/database-model.md').read_text(encoding='utf-8')
+erd = re.search(r'```mermaid\n(.*?)```', db, re.S).group(1)
+tables = re.findall(r'^    (\w+) \{\n(.*?)^    \}', erd, re.M | re.S)
+assert {name for name, _ in tables} == {'Semester', 'Course', 'Student', 'Enrollment', 'Subject'}
+assert sum(len(fields.strip().splitlines()) for _, fields in tables) == 20
+assert len(re.findall(r' PK$', erd, re.M)) == 5 and len(re.findall(r' FK$', erd, re.M)) == 3
+assert len(re.findall(r'\|\|--o\{', erd)) == 3
+print('PASS: documented 13 API operations, 5 entities, 20 columns, 5 PKs and 3 FKs; documentation consistency only, not rendered/runtime verification.')
 print('Application implementation/build/Docker/grader: NOT RUN; this is planning validation only.')

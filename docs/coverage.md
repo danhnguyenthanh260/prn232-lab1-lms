@@ -1,12 +1,12 @@
 # Coverage yêu cầu và giới hạn autograder
 
-Bản này ánh xạ **79/79 mục phân tích** tới công việc, bao phủ **21/21 tiêu chí rubric** và **6/6 penalty**. Đây là coverage kế hoạch; chưa có code ứng dụng, build hoặc runtime PASS. Không phải line/branch coverage.
+Bản này ánh xạ **79/79 mục phân tích** tới công việc, bao phủ **21/21 tiêu chí rubric** và **6/6 penalty**. Đây là coverage kế hoạch, không phải line/branch coverage. Kết quả triển khai và kiểm tra hiện tại được ghi riêng tại [implementation](implementation.md).
 
 [Nguồn, hash và giới hạn screenshot](sources.md) · [Kế hoạch và quyết định](plan.md) · [Dữ liệu để kiểm tra coverage](planning-data.json)
 
 ## Ma trận yêu cầu
 
-Mỗi dòng có một owner chính; QA kiểm chéo toàn bộ khi nghiệm thu. Trạng thái mọi dòng hiện tại: **Chưa kiểm chứng implementation**. B/G là ký hiệu nguồn trong sources.md; các dòng ghi suy ra/đề xuất/ngoài phạm vi được phân biệt với yêu cầu trực tiếp của đề.
+Mỗi dòng có một owner chính; QA kiểm chéo toàn bộ khi nghiệm thu. Bảng dưới giữ yêu cầu và cách kiểm tra, không tự biểu diễn PASS. B/G là ký hiệu nguồn trong sources.md; các dòng ghi suy ra/đề xuất/ngoài phạm vi được phân biệt với yêu cầu trực tiếp của đề.
 
 | ID | Yêu cầu hoặc ranh giới | Nguồn | Issue key | Rubric | Bằng chứng cần có |
 |---|---|---|---|---|---|

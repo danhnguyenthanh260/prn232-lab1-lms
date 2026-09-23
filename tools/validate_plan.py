@@ -66,4 +66,4 @@ assert sum(len(fields.strip().splitlines()) for _, fields in tables) == 20
 assert len(re.findall(r' PK$', erd, re.M)) == 5 and len(re.findall(r' FK$', erd, re.M)) == 3
 assert len(re.findall(r'\|\|--o\{', erd)) == 3
 print('PASS: documented 13 API operations, 5 entities, 20 columns, 5 PKs and 3 FKs; documentation consistency only, not rendered/runtime verification.')
-print('Application implementation/build/Docker/grader: NOT RUN; this is planning validation only.')
+print('This command validates planning documents only; application/build/runtime evidence is recorded separately in docs/implementation.md.')

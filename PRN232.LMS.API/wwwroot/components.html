@@ -1,0 +1,7 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LMS components preview</title><link rel="stylesheet" href="/styles.css"><main class="preview"><h1>Kiểm tra thành phần</h1><div id="preview"></div></main><script type="module">
+import {el,button,link,field,notice,dataTable,empty,confirmDelete} from '/ui.js';
+const root=document.querySelector('#preview');
+root.append(el('section',{class:'preview-section actions'},button('Thêm sinh viên',{class:'primary'}),link('Quay lại','#'),button('Không khả dụng',{disabled:true}),button('Mở xác nhận',{onclick:()=>confirmDelete('Sinh viên thử',async()=>{})})));
+root.append(field('Họ và tên','fullName',{placeholder:'Nhập họ và tên'}),notice('Đang tải dữ liệu…'),notice('Không kết nối được. Hãy thử lại.','error'),notice('Đã lưu sinh viên.','success'));
+root.append(dataTable('Dữ liệu thử giao diện',[{key:'name',label:'Họ tên'},{key:'email',label:'Email'}],[{name:'Nguyễn Minh Anh',email:'student@example.edu'}]),empty('Chưa có sinh viên','Thêm sinh viên đầu tiên để bắt đầu.',link('Thêm sinh viên','#','primary')));
+</script></html>

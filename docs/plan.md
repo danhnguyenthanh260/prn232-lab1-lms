@@ -1,6 +1,6 @@
 # Kế hoạch PRN232 Lab 1
 
-Project: [PRN232 Lab 1 — LMS REST API](https://github.com/users/danhnguyenthanh260/projects/5). Phạm vi hiện tại là backlog và phân tích. 18 issue triển khai/nghiệm thu cộng 1 tracker; mọi issue ở Todo. Không có thời hạn/assignee tự đặt.
+Project: [PRN232 Lab 1 — LMS REST API](https://github.com/users/danhnguyenthanh260/projects/5). Đây là baseline kế hoạch: 18 issue triển khai/nghiệm thu cộng 1 tracker. Kết quả code/runtime mới nhất xem [implementation](implementation.md); trạng thái công việc xem Project. Không có thời hạn/assignee tự đặt.
 
 ## Sản phẩm cần đạt
 

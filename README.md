@@ -1,6 +1,6 @@
 # PRN232 Lab 1 — LMS REST API
 
-Kế hoạch làm bài ASP.NET Core REST API LMS theo đề, phụ lục nộp bài và autograder được cung cấp.
+Ứng dụng ASP.NET Core REST API LMS và giao diện quản lý nhỏ gọn, theo đề Lab 1.
 
 [GitHub Project](https://github.com/users/danhnguyenthanh260/projects/5) · [Issue tổng](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/1) · [Toàn bộ issues](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues)
 
@@ -12,11 +12,28 @@ Kế hoạch làm bài ASP.NET Core REST API LMS theo đề, phụ lục nộp b
 | [Dữ liệu kế hoạch](docs/planning-data.json) | Dữ liệu cấu trúc dùng để kiểm tra coverage |
 | [Mô hình DB](docs/database-model.md) | ERD, 5 bảng/20 cột/3 FK và các quyết định chưa chốt |
 | [API routes](docs/api-routes.md) | 13 operations, routes hỗ trợ và query/related-data contract |
-| [Design pattern LMS](docs/design-pattern.md) | Thiết kế UI quản lý theo tham chiếu Duolingo, browser routes và state matrix; chưa triển khai |
+| [Design pattern LMS](docs/design-pattern.md) | Brief thiết kế gốc; bản UI tối giản và kết quả thực tế xem implementation |
 
 ## Trạng thái
 
-Hiện mới có tài liệu và backlog; **chưa có code ứng dụng, chưa chạy build, Docker hoặc grader**. Tất cả 19 issues ở Todo. Coverage kế hoạch 79/79 không phải phần trăm code hoàn thành hay test coverage.
+Đã có 3 tầng, SQL Server/EF Core, 13 operations, Swagger có hướng dẫn/ví dụ và UI danh sách/chi tiết/thêm/sửa/xóa Student. Xem [kết quả kiểm tra](docs/implementation.md). Đã sửa quy chuẩn route/layering/envelope/Compose; **full grader gốc trên ZIP sạch qua Docker đạt 10/10** ngày 2026-09-23 (static4 + dynamic6, không penalty). Docker build --no-cache, 120 HTTP checks trên Docker và LocalDB, Swagger và restart không nhân seed đều đạt. Đây là kết quả công cụ chấm được cung cấp, không thay thế quyết định chấm của giảng viên. Coverage kế hoạch 79/79 không phải line/branch coverage.
+
+Chạy nhanh trên máy Windows đã có LocalDB:
+
+```powershell
+./tools/run-local.ps1
+```
+
+Mở [LMS](http://localhost:8088/students) hoặc [Swagger](http://localhost:8088/swagger). Database riêng PRN232Lab1, không dùng DB dự án khác.
+
+Chạy đúng môi trường Docker khi Docker Desktop/ổ đĩa sẵn sàng:
+
+```powershell
+$env:API_PORT='8088'
+docker compose -p prn232-lab1 up --build -d
+```
+
+Compose publish API trên host theo đúng mẫu cổng của đề; DB không publish port. Chỉ chạy trong môi trường học tập tin cậy, không mở ra Internet. Mật khẩu mặc định trong Compose chỉ là giá trị demo công khai, không dùng cho hệ thống thật. Chế độ LocalDB vẫn chỉ bind loopback.
 
 ## Phạm vi bài
 
@@ -29,11 +46,11 @@ Hiện mới có tài liệu và backlog; **chưa có code ứng dụng, chưa c
 
 Không có auth/JWT, frontend hoặc cloud hosting trong phạm vi bắt buộc.
 
-Theo lựa chọn của người dùng ngày 2026-09-22, đã bổ sung **thiết kế** giao diện quản lý LMS. Đây là phần mở rộng ngoài rubric; không thay API bằng website, không thêm application project thứ tư vào gói nộp và chưa có code/frontend runtime.
+Theo yêu cầu triển khai ngày 2026-09-22, UI dùng HTML/CSS/JavaScript ngay trong API/wwwroot. Đây là phần mở rộng ngoài rubric; không thêm application project thứ tư hoặc toolchain frontend.
 
 ## Bắt đầu
 
-Xem [issue #2: nền tảng](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/2) và các phụ thuộc trong Project. Đọc nguồn và decision log trước khi code. Bản gốc PDF/ZIP được giữ ở Downloads của chủ repo; public repo chỉ chứa phân tích và hash nhận dạng.
+Xem [repo map](REPO-MAP.md), [issue tổng](https://github.com/danhnguyenthanh260/prn232-lab1-lms/issues/1) và các phụ thuộc trong Project. Bản gốc PDF/ZIP giảng viên được giữ local; không phân phối lại cùng source.
 
 Kiểm tra tính đầy đủ của kế hoạch bằng:
 
@@ -43,4 +60,4 @@ python tools/validate_plan.py
 
 Lệnh này chỉ kiểm dữ liệu kế hoạch, không chấm bài API. Khi triển khai xong, issue QA yêu cầu full grader trên ZIP cuối cùng và bổ sung những trường hợp grader chưa kiểm tra.
 
-README hiện tại mô tả repository lập kế hoạch. Issue đóng gói sẽ tạo README nộp bài tối đa một trang với MSSV, họ tên, lệnh chạy, seed counts và limitations thực tế.
+Kiểm API bằng `python tools/check_api.py http://127.0.0.1:8088`. Tạo ZIP bằng `python tools/package.py`; script chỉ lấy ba project và cấu hình nộp bài, loại bin/obj/DB/QA artifacts. Identity thật lấy từ `submission.local.json` (ignored); public template không chứa thông tin sinh viên. Nếu thiếu identity, chỉ tạo ZIP DRAFT.

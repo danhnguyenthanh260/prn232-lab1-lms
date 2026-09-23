@@ -1,0 +1,9 @@
+**/bin
+**/obj
+.git
+.state
+artifacts
+tools
+docs
+**/node_modules
+.env

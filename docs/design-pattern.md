@@ -1,5 +1,7 @@
 # Design pattern — giao diện quản lý LMS
 
+Bản dưới là brief gốc. Người dùng đã yêu cầu triển khai bản đơn giản sau đó; tiến độ/biến thể thực tế xem [implementation](implementation.md). UI hiện dùng native controls và navigation wrap, không thêm UI framework.
+
 Ngày 2026-09-22, người dùng chọn **giao diện quản lý LMS**, không phải landing page. Đây là brief thiết kế bổ sung; chưa phải code, prototype đã render hay UI đã kiểm thử. Không thay 79 mục coverage/21 tiêu chí chấm của bài API.
 
 ## Mục tiêu và phạm vi

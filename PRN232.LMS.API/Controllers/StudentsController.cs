@@ -6,7 +6,7 @@ using PRN232.LMS.Services;
 namespace PRN232.LMS.API.Controllers;
 
 [ApiController]
-[Route("api/students")]
+[Route("api/[controller]")]
 [ProducesResponseType(typeof(ApiResponseModel), 400), ProducesResponseType(typeof(ApiResponseModel), 404)]
 public sealed class StudentsController(ILmsService service) : ControllerBase
 {
@@ -29,6 +29,6 @@ public sealed class StudentsController(ILmsService service) : ControllerBase
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await service.DeleteAsync(id, ct);
-        return Ok(new ApiResponseModel(true, "Student deleted.", null, []));
+        return Ok(new ApiResponseModel(true, "Student deleted.", null, null));
     }
 }

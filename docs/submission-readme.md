@@ -7,11 +7,10 @@ Stack: .NET 8, EF Core, SQL Server 2022; ba project API → Services → Reposit
 Chạy bằng PowerShell khi Docker Desktop đã hoạt động:
 
 ```powershell
-$env:API_PORT='8088'
-docker compose -p prn232-lab1 up --build -d
+docker compose up --build -d
 ```
 
-UI: http://localhost:8088/students · Swagger: http://localhost:8088/swagger · Readiness: /health.
+UI: http://localhost:8080/students · Swagger: http://localhost:8080/swagger · Readiness: /health. Đặt API_PORT nếu cần đổi cổng host. API publish cổng host theo đề; chỉ chạy trong mạng tin cậy, không mở ra Internet.
 
 API có 5 list/detail resources và POST/PUT/DELETE students. Tất cả list hỗ trợ search, sort, page, size, fields, expand. Seed lần đầu: 5 semesters, 10 subjects, 20 courses, 50 students, 500 enrollments; knownIds ban đầu đều là 1. Startup dùng EnsureCreated và seed transaction, không cần lệnh migration thủ công. Không xóa/reset DB dùng chung; Compose chỉ dùng volume riêng.
 

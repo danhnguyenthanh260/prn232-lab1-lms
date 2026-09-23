@@ -4,7 +4,7 @@ using PRN232.LMS.API.ResponseModels;
 using PRN232.LMS.Services;
 namespace PRN232.LMS.API.Controllers;
 [ApiController]
-[Route("api/courses")]
+[Route("api/[controller]")]
 [ProducesResponseType(typeof(ApiResponseModel), 400), ProducesResponseType(typeof(ApiResponseModel), 404)]
 public sealed class CoursesController(ILmsService service) : ControllerBase
 {

@@ -20,8 +20,9 @@ def request(path, method='GET', body=None, status=200):
     payload=json.load(response)
     assert response.status==status,(path,response.status,payload)
     assert {'success','message','data','errors'}<=payload.keys(),(path,payload)
-    assert isinstance(payload['errors'],list) and payload['success']==(status<400)
-    if status>=400: assert payload['data'] is None and payload['errors']
+    assert payload['success']==(status<400)
+    if status>=400: assert payload['data'] is None and isinstance(payload['errors'],list) and payload['errors']
+    else: assert payload['errors'] is None, (path, payload)
     checks+=1
     return payload,response.headers
 

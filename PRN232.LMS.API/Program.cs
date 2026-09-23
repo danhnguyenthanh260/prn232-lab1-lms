@@ -8,11 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRepositories(builder.Configuration.GetConnectionString("Lms")
     ?? throw new InvalidOperationException("Set ConnectionStrings__Lms to a SQL Server connection string."));
 builder.Services.AddScoped<ILmsService, LmsService>();
-builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+builder.Services.AddControllers(options => options.Conventions.Add(new PRN232.LMS.API.Routing.LowercaseControllerConvention()))
+    .ConfigureApiBehaviorOptions(options =>
     options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(ApiResponseModel.Error("Invalid input.",
         context.ModelState.SelectMany(x => x.Value!.Errors.Select(e => string.IsNullOrEmpty(e.ErrorMessage) ? $"Invalid {x.Key}." : e.ErrorMessage)).ToArray())));
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCase());
+builder.Services.AddSwaggerGen(options =>
+{
+    options.DescribeAllParametersInCamelCase();
+    options.OperationFilter<PRN232.LMS.API.Swagger.UsageDocumentation>();
+    options.SchemaFilter<PRN232.LMS.API.Swagger.StudentDocumentation>();
+});
 var app = builder.Build();
 app.Use(async (context, next) =>
 {
@@ -37,7 +43,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapControllers();
 app.MapGet("/health", async (ILmsService service, CancellationToken ct) =>
-    await service.IsReadyAsync(ct) ? Results.Ok(new ApiResponseModel(true, "Ready", new { status = "healthy" }, []))
+    await service.IsReadyAsync(ct) ? Results.Ok(new ApiResponseModel(true, "Ready", new { status = "healthy" }, null))
         : Results.Json(ApiResponseModel.Error("Database unavailable."), statusCode: 503));
 app.MapFallback(async context =>
 {
@@ -49,5 +55,4 @@ app.MapFallback(async context =>
     }
     else { context.Response.StatusCode = 404; await context.Response.WriteAsJsonAsync(ApiResponseModel.Error("Route not found.")); }
 });
-await app.Services.InitializeDatabaseAsync();
 await app.RunAsync();

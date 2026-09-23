@@ -33,7 +33,7 @@ $env:API_PORT='8088'
 docker compose -p prn232-lab1 up --build -d
 ```
 
-API chỉ bind host loopback; DB không publish port. Mật khẩu mặc định trong Compose chỉ là giá trị demo công khai, không dùng cho hệ thống thật.
+Compose publish API trên host theo đúng mẫu cổng của đề; DB không publish port. Chỉ chạy trong môi trường học tập tin cậy, không mở ra Internet. Mật khẩu mặc định trong Compose chỉ là giá trị demo công khai, không dùng cho hệ thống thật. Chế độ LocalDB vẫn chỉ bind loopback.
 
 ## Phạm vi bài
 

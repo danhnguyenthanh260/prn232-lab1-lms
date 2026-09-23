@@ -31,3 +31,12 @@
 - Release build PASS 0 warnings/errors; package audit no vulnerable dependencies reported. Added read-only ZIP regression checker.
 - New ZIP includes Swagger and compliance source, 31 files; SHA256 F5E63A5FA93E8CDC38E5298D6023E5AF920A2A3A7B6A9130193D7C979354B844. Previous ZIP preserved under artifacts/previous-submission/. Reader review: identity and concise Docker README verified, no QA/internal files in ZIP.
 - Full original grader running: artifacts/grading-full-compliance, work artifacts/grading-work-compliance, isolated Compose prn232lab1_se193274 on8092. No pre-existing containers/volumes for this project. Static9 PASS; Docker downloading/building; final acceptance pending. Docker29.8.0 responsive, C now ~70GiB free. -KeepContainers used for post-grader HTTP/UI verification.
+
+### Final acceptance receipt — 2026-09-23
+
+- Source1293590 pushed to feature/lab1-app; includes preserved Swagger improvements and four compliance repairs. PR20 open, not merged.
+- First grader timed out on cold SQL image download; retry pull succeeded. Independent --no-cache Docker build from extracted ZIP PASS.
+- Original full grader retry exit0: 10/10 (static4,dynamic6,penalty0), all21 criteria ratio1. No SkipDynamic/Resume or grader edits. Final report artifacts/grading-full-compliance-retry/SE193274_report.md; exact ZIP SHA256 remains F5E63A5FA93E8CDC38E5298D6023E5AF920A2A3A7B6A9130193D7C979354B844.
+- Post-grader Docker checks: HTTP120 PASS, Swagger examples/schema PASS, browser students PASS. Restart health200 and all5 counts unchanged; 51students includes one grader-created student, not duplicated seed.
+- Scoped QA Compose containers/network/volume removed after acceptance; only disposable test data. LocalDB untouched. Release app remains on8088, browser restored to Swagger. LocalDB ephemeral pipe workaround only applies to current runtime; discovery/start issue remains separate from verified Docker delivery.
+- README/implementation/state updated to final PASS, preserving failed attempts as history. ZIP remains local/private; no personal submission manifest/report uploaded to GitHub. Final score is provided-grader evidence, not a guarantee of instructor assessment.

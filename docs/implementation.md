@@ -1,5 +1,26 @@
 # Bản triển khai Lab 1
 
+## Cập nhật quy chuẩn 2026-09-23
+
+Source `1293590`: Compose dùng đúng `${API_PORT:-8080}:8080`; cả 5 controller dùng `api/[controller]` với convention lowercase; `AddRepositories` đăng ký hosted initializer để tự tạo/seed DB trước khi nhận HTTP; Program không còn gọi khởi tạo DB trực tiếp; response thành công có `errors: null`, lỗi vẫn là mảng. Giữ hướng dẫn/ví dụ Swagger cho từng resource. Mô hình startup tham khảo [Microsoft Hosted Services](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-8.0).
+
+- Release build: 0 warning/error; audit package không báo lỗ hổng.
+- Runtime mới trên LocalDB: 120 HTTP checks PASS với assertion `errors is null`; Swagger 30 mô tả, 29 ví dụ HTTP và 5 query kết hợp PASS. UI list/detail/404 vẫn đọc đúng contract.
+- ZIP mới: 31 files, đúng 3 project; checker xác nhận source ZIP khớp checkout, identity/README đúng, không có artifacts/QA/DB/bin/obj. SHA256 `F5E63A5FA93E8CDC38E5298D6023E5AF920A2A3A7B6A9130193D7C979354B844`.
+- Docker API build từ source giải nén, `--no-cache`: PASS; image `prn232-lab1-acceptance:compliance`. NuGet có timeout tải và tự retry thành công.
+- Full grader lượt 1: static4/4, penalty0; Compose hết hạn900s trong lúc tải SQL Server. Image download báo short read 441810944/502095731 bytes; một pull báo DNS `mcr.microsoft.com: no such host`. Report ở `artifacts/grading-full-compliance` được giữ làm lịch sử, không phải kết quả cuối. Retry image download thành công, không sửa grader.
+- **Full grader lượt 2 PASS 10/10** lúc 15:23:53 ngày 2026-09-23: static4 + dynamic6 + penalty0; ST-01…09 và DY-01…12 đều ratio1. Chạy Grade-Lab1.ps1 gốc trên ZIP sạch cùng SHA256 ở trên, không SkipDynamic/Resume; SQL Server 2022 và API container khởi động thành công, /health200. Report local: `artifacts/grading-full-compliance-retry/SE193274_report.md`, kèm raw JSON/log/SUMMARY.csv. Không upload ZIP/report chứa identity lên public GitHub.
+- Sau grader: 120 HTTP checks trên Docker port8092 PASS; Swagger examples/schema PASS; UI /students tải thành công. Restart API vẫn healthy và số bản ghi cả 5 resource giữ nguyên (5 semesters,10 subjects,51 students,20 courses,500 enrollments). Student thứ51 do grader tạo, không phải nhân seed.
+- Đã dọn riêng container/network/volume QA của Compose project `prn232lab1_se193274`; chỉ chứa seed và dữ liệu kiểm thử của lượt này. LocalDB và app trên8088 được giữ nguyên. Kết quả 10/10 là của công cụ được cung cấp, không phải cam kết điểm chính thức của giảng viên.
+
+Lệnh nghiệm thu đã chạy (PowerShell 7):
+
+```powershell
+pwsh -NoProfile -File artifacts/grader/prn232-lab1-grader/Grade-Lab1.ps1 -SubmissionsDir artifacts -Filter PRN232_LAB1_SE193274_NguyenThanhDanh.zip -OutputDir artifacts/grading-full-compliance-retry -WorkDir artifacts/grading-work-compliance-retry -ApiPort 8092 -KeepContainers
+```
+
+Compose giờ publish cổng host theo mẫu đề, không còn giới hạn loopback. Chỉ chạy trên máy/mạng học tập tin cậy, không mở Internet. LocalDB mode vẫn bind127.0.0.1. Các mục dưới đây là bằng chứng lịch sử ngày22, không thay thế cập nhật này.
+
 ## Đã có
 
 - .NET 8: API → Services → Repositories; 4 nhóm model, controller không truy cập DB.

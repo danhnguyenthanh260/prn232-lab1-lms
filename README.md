@@ -16,7 +16,7 @@
 
 ## Trạng thái
 
-Đã có 3 tầng, SQL Server/EF Core, 13 operations, Swagger và UI danh sách/chi tiết/thêm/sửa/xóa Student. Xem [kết quả kiểm tra](docs/implementation.md). Build và kiểm tra HTTP đã chạy trên SQL Server LocalDB; Docker build bị chặn bởi ổ C gần đầy, **chưa nghiệm thu full Docker grader**. Coverage kế hoạch 79/79 không phải line/branch coverage.
+Đã có 3 tầng, SQL Server/EF Core, 13 operations, Swagger có hướng dẫn/ví dụ và UI danh sách/chi tiết/thêm/sửa/xóa Student. Xem [kết quả kiểm tra](docs/implementation.md). Đã sửa quy chuẩn route/layering/envelope/Compose; **full grader gốc trên ZIP sạch qua Docker đạt 10/10** ngày 2026-09-23 (static4 + dynamic6, không penalty). Docker build --no-cache, 120 HTTP checks trên Docker và LocalDB, Swagger và restart không nhân seed đều đạt. Đây là kết quả công cụ chấm được cung cấp, không thay thế quyết định chấm của giảng viên. Coverage kế hoạch 79/79 không phải line/branch coverage.
 
 Chạy nhanh trên máy Windows đã có LocalDB:
 

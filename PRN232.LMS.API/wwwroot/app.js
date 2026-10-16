@@ -1,4 +1,5 @@
 import {el,button,link,field,notice,dataTable,empty,confirmDelete} from './ui.js';
+import {authenticatedFetch} from './auth.js';
 
 const resources = {
   students:{title:'Sinh viên',singular:'sinh viên',icon:'♙',description:'Mỗi hành trình học tập bắt đầu từ một hồ sơ.',id:'studentId',name:'fullName',columns:['fullName','email','dateOfBirth']},
@@ -7,7 +8,7 @@ const resources = {
   courses:{title:'Lớp học',singular:'lớp học',icon:'▧',description:'Tra cứu lớp học và các đăng ký liên quan.',id:'courseId',name:'courseName',columns:['courseName','semesterId']},
   enrollments:{title:'Đăng ký học',singular:'đăng ký',icon:'✓',description:'Theo dõi sinh viên, lớp học và trạng thái đăng ký.',id:'enrollmentId',name:'enrollmentId',columns:['enrollmentId','studentId','courseId','enrollDate','status']}
 };
-const labels = {studentId:'Mã sinh viên',fullName:'Họ và tên',email:'Email',dateOfBirth:'Ngày sinh',semesterId:'Mã học kỳ',semesterName:'Tên học kỳ',startDate:'Bắt đầu',endDate:'Kết thúc',subjectId:'Mã môn',subjectCode:'Mã môn học',subjectName:'Tên môn học',credit:'Tín chỉ',courseId:'Mã lớp',courseName:'Tên lớp học',enrollmentId:'Mã đăng ký',enrollDate:'Ngày đăng ký',status:'Trạng thái'};
+const labels = {phoneNumber:'Số điện thoại',studentId:'Mã sinh viên',fullName:'Họ và tên',email:'Email',dateOfBirth:'Ngày sinh',semesterId:'Mã học kỳ',semesterName:'Tên học kỳ',startDate:'Bắt đầu',endDate:'Kết thúc',subjectId:'Mã môn',subjectCode:'Mã môn học',subjectName:'Tên môn học',credit:'Tín chỉ',courseId:'Mã lớp',courseName:'Tên lớp học',enrollmentId:'Mã đăng ký',enrollDate:'Ngày đăng ký',status:'Trạng thái'};
 const params = new URLSearchParams(location.search);
 const segments = location.pathname.split('/').filter(Boolean);
 const resource = segments[0] || 'students';
@@ -27,11 +28,11 @@ function format(key,value) {
 }
 async function api(path, options = {}) {
   let response;
-  try { response=await fetch(`/api/${path}`,{...options,headers:{'Content-Type':'application/json',...options.headers}}); }
+  try { response=await authenticatedFetch(`/api/v1/${path}`,{...options,headers:{'Content-Type':'application/json',...options.headers}}); }
   catch { throw new Error(options.method ? 'Chưa xác nhận được thao tác. Kiểm tra lại dữ liệu trước khi gửi lại.' : 'Không kết nối được máy chủ. Vui lòng thử lại.'); }
   const payload=await response.json();
   if(!response.ok) {
-    const error = new Error(response.status===404 ? 'Không tìm thấy bản ghi này.' : (payload.errors?.join(' ') || payload.message || 'Có lỗi xảy ra.'));
+    const error = new Error(response.status===401 ? 'Bạn cần đăng nhập để thực hiện thao tác này.' : response.status===403 ? 'Tài khoản này không có quyền thực hiện thao tác.' : response.status===404 ? 'Không tìm thấy bản ghi này.' : (payload.errors?.join(' ') || payload.message || 'Có lỗi xảy ra.'));
     error.status=response.status; throw error;
   }
   return payload;
@@ -96,12 +97,14 @@ async function edit(id) {
   const today=new Date().toISOString().slice(0,10);
   form.append(field('Họ và tên','fullName',{required:true,maxlength:100,autocomplete:'name',value:existing?.fullName||''}),field('Email','email',{type:'email',required:true,maxlength:100,autocomplete:'email',value:existing?.email||''}),field('Ngày sinh','dateOfBirth',{type:'date',required:true,min:'1753-01-01',max:today,value:existing?.dateOfBirth?.slice(0,10)||''}));
   const errorArea=el('div',{tabindex:'-1'});
+  form.append(field('Số điện thoại (tùy chọn)','phoneNumber',{type:'tel',maxlength:30,value:existing?.phoneNumber||''}));
   const save=button('Lưu sinh viên',{type:'submit',class:'primary'});
-  form.append(el('p',{class:'helper'},'Mã sinh viên được hệ thống tạo tự động. Các trường trên đều bắt buộc.'),errorArea,el('div',{class:'actions'},save,link('Hủy',id?`/students/${id}${location.search}`:destination())));
+  form.append(el('p',{class:'helper'},'Mã sinh viên được tạo tự động. Họ tên, email và ngày sinh là bắt buộc.'),errorArea,el('div',{class:'actions'},save,link('Hủy',id?`/students/${id}${location.search}`:destination())));
   form.addEventListener('input',()=>{dirty=true;});
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(save.disabled)return;save.disabled=true;save.textContent='Đang lưu…';errorArea.replaceChildren();
     const input=Object.fromEntries(new FormData(form));
+    if(!input.phoneNumber) input.phoneNumber=null;
     try { const result=await api(`students${id?'/'+id:''}`,{method:id?'PUT':'POST',body:JSON.stringify(input)});dirty=false;const query=new URLSearchParams(params);query.set('saved','1');query.delete('deleted');location.href=`/students/${result.data.studentId}?${query}`; }
     catch(error){errorArea.replaceChildren(notice(error.message,'error'));errorArea.focus();save.disabled=false;save.textContent='Lưu sinh viên';}
   });

@@ -10,9 +10,20 @@ public sealed class LmsDbContext(DbContextOptions<LmsDbContext> options) : DbCon
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<Student> Students => Set<Student>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.Entity<User>().ToTable("Users");
+        b.Entity<User>().HasIndex(x => x.Username).IsUnique();
+        b.Entity<User>().Property(x => x.Username).HasColumnType("varchar(50)").IsRequired();
+        b.Entity<User>().Property(x => x.PasswordHash).HasColumnType("varchar(255)").IsRequired();
+        b.Entity<User>().Property(x => x.Role).HasColumnType("varchar(20)").IsRequired();
+        b.Entity<RefreshToken>().HasIndex(x => x.TokenHash).IsUnique();
+        b.Entity<RefreshToken>().Property(x => x.TokenHash).HasColumnType("varchar(64)").IsRequired();
+        b.Entity<RefreshToken>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
+        b.Entity<Student>().Property(x => x.PhoneNumber).HasColumnType("varchar(30)");
         b.Entity<Semester>().Property(x => x.SemesterName).HasColumnType("nvarchar(100)").IsRequired();
         b.Entity<Semester>().Property(x => x.StartDate).HasColumnType("datetime");
         b.Entity<Semester>().Property(x => x.EndDate).HasColumnType("datetime");

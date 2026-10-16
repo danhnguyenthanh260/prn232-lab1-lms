@@ -13,6 +13,7 @@ public interface ILmsService
     Task<RecordBusinessModel> CreateAsync(StudentBusinessModel student, CancellationToken ct);
     Task<RecordBusinessModel> UpdateAsync(int id, StudentBusinessModel student, CancellationToken ct);
     Task DeleteAsync(int id, CancellationToken ct);
+    Task<PageBusinessModel> CourseStudentsAsync(int courseId, CancellationToken ct);
     Task<bool> IsReadyAsync(CancellationToken ct);
 }
 
@@ -24,7 +25,7 @@ public sealed class LmsService(ILmsRepository repository) : ILmsService
         ["semesters"] = new(["semesterId", "semesterName", "startDate", "endDate"], ["SemesterName"], ["courses"]),
         ["subjects"] = new(["subjectId", "subjectCode", "subjectName", "credit"], ["SubjectCode", "SubjectName"], []),
         ["courses"] = new(["courseId", "courseName", "semesterId"], ["CourseName"], ["semester", "enrollments"]),
-        ["students"] = new(["studentId", "fullName", "email", "dateOfBirth"], ["FullName", "Email"], ["enrollments"]),
+        ["students"] = new(["studentId", "fullName", "email", "dateOfBirth", "phoneNumber"], ["FullName", "Email"], ["enrollments"]),
         ["enrollments"] = new(["enrollmentId", "studentId", "courseId", "enrollDate", "status"], ["Status"], ["student", "course"])
     };
     private static string Pascal(string value) => char.ToUpperInvariant(value[0]) + value[1..];
@@ -96,23 +97,29 @@ public sealed class LmsService(ILmsRepository repository) : ILmsService
             throw new ServiceException(400, "email must be a valid address of at most 100 ASCII characters.");
         if (student.DateOfBirth < new DateTime(1753, 1, 1) || student.DateOfBirth.Date > DateTime.UtcNow.Date)
             throw new ServiceException(400, "dateOfBirth must be a valid past or current date.");
-        return new(name, email, student.DateOfBirth.Date);
+        return new(name, email, student.DateOfBirth.Date, student.PhoneNumber);
     }
     public async Task<RecordBusinessModel> CreateAsync(StudentBusinessModel student, CancellationToken ct)
     {
         var valid = Validate(student);
-        var entity = await repository.AddStudentAsync(new Student { FullName = valid.FullName, Email = valid.Email, DateOfBirth = valid.DateOfBirth }, ct);
+        var entity = await repository.AddStudentAsync(new Student { FullName = valid.FullName, Email = valid.Email, DateOfBirth = valid.DateOfBirth, PhoneNumber = valid.PhoneNumber }, ct);
         return new(Map(entity, []));
     }
     public async Task<RecordBusinessModel> UpdateAsync(int id, StudentBusinessModel student, CancellationToken ct)
     {
         var valid = Validate(student);
-        if (!await repository.UpdateStudentAsync(id, valid.FullName, valid.Email, valid.DateOfBirth, ct)) throw new ServiceException(404, "Student not found.");
+        if (!await repository.UpdateStudentAsync(id, valid.FullName, valid.Email, valid.DateOfBirth, valid.PhoneNumber, ct)) throw new ServiceException(404, "Student not found.");
         return await DetailAsync("students", id, ct);
     }
     public async Task DeleteAsync(int id, CancellationToken ct)
     {
         if (!await repository.DeleteStudentAsync(id, ct)) throw new ServiceException(404, "Student not found.");
+    }
+    public async Task<PageBusinessModel> CourseStudentsAsync(int courseId, CancellationToken ct)
+    {
+        _ = await repository.FindAsync<Course>(courseId, [], ct) ?? throw new ServiceException(404, "Course not found.");
+        var students = await repository.CourseStudentsAsync(courseId, ct);
+        return new(students.Select(x => new RecordBusinessModel(Map(x, []))).ToArray(), 1, Math.Max(1, students.Count), students.Count);
     }
     public Task<bool> IsReadyAsync(CancellationToken ct) => repository.IsReadyAsync(ct);
 }

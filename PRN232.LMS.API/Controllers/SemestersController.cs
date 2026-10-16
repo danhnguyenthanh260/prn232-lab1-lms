@@ -1,9 +1,13 @@
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRN232.LMS.API.RequestModels;
 using PRN232.LMS.API.ResponseModels;
 using PRN232.LMS.Services;
 namespace PRN232.LMS.API.Controllers;
 [ApiController]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Route("api/[controller]")]
 [ProducesResponseType(typeof(ApiResponseModel), 400), ProducesResponseType(typeof(ApiResponseModel), 404)]
 public sealed class SemestersController(ILmsService service) : ControllerBase

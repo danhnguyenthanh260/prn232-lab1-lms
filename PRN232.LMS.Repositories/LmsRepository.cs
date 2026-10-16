@@ -13,8 +13,9 @@ public interface ILmsRepository
     Task<EntityPage<T>> ListAsync<T>(QuerySpec spec, CancellationToken ct) where T : class;
     Task<T?> FindAsync<T>(int id, string[] includes, CancellationToken ct) where T : class;
     Task<Student> AddStudentAsync(Student student, CancellationToken ct);
-    Task<bool> UpdateStudentAsync(int id, string name, string email, DateTime birth, CancellationToken ct);
+    Task<bool> UpdateStudentAsync(int id, string name, string email, DateTime birth, string? phone, CancellationToken ct);
     Task<bool> DeleteStudentAsync(int id, CancellationToken ct);
+    Task<List<Student>> CourseStudentsAsync(int courseId, CancellationToken ct);
     Task<bool> IsReadyAsync(CancellationToken ct);
 }
 
@@ -68,11 +69,11 @@ public sealed class LmsRepository(LmsDbContext db) : ILmsRepository
         await db.SaveChangesAsync(ct);
         return student;
     }
-    public async Task<bool> UpdateStudentAsync(int id, string name, string email, DateTime birth, CancellationToken ct)
+    public async Task<bool> UpdateStudentAsync(int id, string name, string email, DateTime birth, string? phone, CancellationToken ct)
     {
         var student = await db.Students.FindAsync([id], ct);
         if (student is null) return false;
-        student.FullName = name; student.Email = email; student.DateOfBirth = birth;
+        student.FullName = name; student.Email = email; student.DateOfBirth = birth; student.PhoneNumber = phone;
         await db.SaveChangesAsync(ct);
         return true;
     }
@@ -84,5 +85,7 @@ public sealed class LmsRepository(LmsDbContext db) : ILmsRepository
         await db.SaveChangesAsync(ct);
         return true;
     }
+    public Task<List<Student>> CourseStudentsAsync(int courseId, CancellationToken ct) =>
+        db.Students.AsNoTracking().Where(s => s.Enrollments.Any(e => e.CourseId == courseId)).OrderBy(s => s.StudentId).ToListAsync(ct);
     public Task<bool> IsReadyAsync(CancellationToken ct) => db.Database.CanConnectAsync(ct);
 }

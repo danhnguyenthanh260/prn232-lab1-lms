@@ -1,15 +1,22 @@
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRN232.LMS.API.RequestModels;
 using PRN232.LMS.API.ResponseModels;
 using PRN232.LMS.Services;
 namespace PRN232.LMS.API.Controllers;
 [ApiController]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Route("api/[controller]")]
 [ProducesResponseType(typeof(ApiResponseModel), 400), ProducesResponseType(typeof(ApiResponseModel), 404)]
 public sealed class CoursesController(ILmsService service) : ControllerBase
 {
     [HttpGet, ProducesResponseType(typeof(ApiResponseModel), 200)]
     public async Task<IActionResult> List([FromQuery] ListRequestModel query, CancellationToken ct) => Ok(ApiResponseModel.List(await service.ListAsync("courses", query.ToBusiness(), ct)));
+    [HttpGet("{courseId:int}/students")]
+    public async Task<IActionResult> Students([FromRoute] int courseId, CancellationToken ct) => Ok(ApiResponseModel.List(await service.CourseStudentsAsync(courseId, ct)));
+
     [HttpGet("{id:int}"), ProducesResponseType(typeof(ApiResponseModel), 200)]
     public async Task<IActionResult> Detail(int id, CancellationToken ct) => Ok(ApiResponseModel.Ok(await service.DetailAsync("courses", id, ct)));
 }

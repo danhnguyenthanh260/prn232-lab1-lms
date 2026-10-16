@@ -1,5 +1,6 @@
 """HTTP acceptance on disposable lab data; never targets anything except explicit base URL."""
 import json
+import os
 import sys
 import urllib.request
 import urllib.error
@@ -12,7 +13,9 @@ checks = 0
 def request(path, method='GET', body=None, status=200):
     global checks
     data = None if body is None else json.dumps(body).encode()
-    req = urllib.request.Request(BASE+path, data=data, method=method, headers={'Content-Type':'application/json'})
+    headers={'Content-Type':'application/json','Accept':'application/json'}
+    if os.environ.get('LMS_ACCESS_TOKEN'): headers['Authorization']='Bearer '+os.environ['LMS_ACCESS_TOKEN']
+    req = urllib.request.Request(BASE+path, data=data, method=method, headers=headers)
     try:
         response=urllib.request.urlopen(req, timeout=20)
     except urllib.error.HTTPError as error:
@@ -54,7 +57,7 @@ stamp=datetime.now().strftime('%H%M%S%f')
 body={'fullName':'HTTP QA '+stamp,'email':f'qa{stamp}@example.test','dateOfBirth':'2003-01-15'}
 created,headers=request('/api/students','POST',body,201);identifier=created['data']['studentId']
 try:
-    assert headers['Location'].endswith('/api/students/'+str(identifier))
+    assert any(headers['Location'].endswith(prefix+str(identifier)) for prefix in ['/api/students/','/api/v1/students/'])
     found,_=request('/api/students/'+str(identifier));assert found['data']['fullName']==body['fullName']
     body['fullName']='Updated '+stamp
     request('/api/students/'+str(identifier),'PUT',body)
@@ -77,6 +80,7 @@ finally:
     for tie_id in tie_ids: request('/api/students/'+str(tie_id),'DELETE')
 with urllib.request.urlopen(BASE+'/swagger/v1/swagger.json') as response:
     doc=json.load(response)
-assert sum(method in {'get','post','put','delete'} for path,methods in doc['paths'].items() if path.startswith('/api/') for method in methods)==13
-assert {p['name'] for p in doc['paths']['/api/students']['get']['parameters']}=={'search','sort','page','size','fields','expand'}
-print(f'PASS: {checks} HTTP contract checks; five-resource query matrix, persisted Student lifecycle, error envelopes and 13 OpenAPI operations.')
+student_path='/api/v1/students' if '/api/v1/students' in doc['paths'] else '/api/students'
+assert sum(method in {'get','post','put','delete'} for path,methods in doc['paths'].items() if path.startswith('/api/') for method in methods)>=13
+assert {'search','sort','page','size','fields','expand'}<={p['name'] for p in doc['paths'][student_path]['get']['parameters']}
+print(f'PASS: {checks} HTTP contract checks; five-resource query matrix, persisted Student lifecycle, error envelopes and OpenAPI operations.')

@@ -1,3 +1,11 @@
+# PRN232 LMS — Lab 2
+
+Current branch implements Lab 2 on the existing Lab 1 LMS. See [Lab 2 run/submission guide](docs/lab2-submission-readme.md) and [coverage and acceptance](docs/lab2-implementation.md). See [architecture and token Q&A](docs/lab2-architecture-qa.md) for the presentation walkthrough.
+
+Docker demo: http://localhost:8093/swagger. Package with `python tools/package.py --lab2`. Slides are under `artifacts/lab2-presentation/`.
+
+The following section preserves the historical Lab 1 documentation. Its LocalDB startup and authentication assumptions do not apply to Lab 2; use the Lab 2 guide above.
+
 # PRN232 Lab 1 — LMS REST API
 
 Ứng dụng ASP.NET Core REST API LMS và giao diện quản lý nhỏ gọn, theo đề Lab 1.
@@ -6,6 +14,7 @@
 
 | Tài liệu | Nội dung |
 |---|---|
+| [Hướng dẫn Swagger](docs/swagger-guide.md) | Cách nhập tham số, ví dụ query và body Student |
 | [Coverage](docs/coverage.md) | 79 mục phân tích → issue → cách kiểm tra; đủ 21 tiêu chí và 6 penalty |
 | [Kế hoạch](docs/plan.md) | 19 issues, 3 milestone, dependency và 10 điểm cần quyết định |
 | [Nguồn](docs/sources.md) | Bộ tài liệu đã đọc, SHA-256, bản trùng và giới hạn của screenshot |
@@ -29,9 +38,11 @@ Mở [LMS](http://localhost:8088/students) hoặc [Swagger](http://localhost:808
 Chạy đúng môi trường Docker khi Docker Desktop/ổ đĩa sẵn sàng:
 
 ```powershell
-$env:API_PORT='8088'
+$env:API_PORT='8080'
 docker compose -p prn232-lab1 up --build -d
 ```
+
+Swagger Docker: http://localhost:8080/swagger/index.html.
 
 Compose publish API trên host theo đúng mẫu cổng của đề; DB không publish port. Chỉ chạy trong môi trường học tập tin cậy, không mở ra Internet. Mật khẩu mặc định trong Compose chỉ là giá trị demo công khai, không dùng cho hệ thống thật. Chế độ LocalDB vẫn chỉ bind loopback.
 

@@ -3,5 +3,9 @@
     <ProjectReference Include="../PRN232.LMS.Services/PRN232.LMS.Services.csproj" />
     <ProjectReference Include="../PRN232.LMS.Repositories/PRN232.LMS.Repositories.csproj" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.20" />
+    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
   </ItemGroup>
 </Project>

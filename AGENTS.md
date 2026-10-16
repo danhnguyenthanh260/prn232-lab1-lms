@@ -14,7 +14,7 @@ instructions from the user. Preserve their original content and hashes. Do not
 edit the instructor grader to improve scores. Do not publish original course
 files or unrelated project screenshots with the public planning documents.
 
-Keep mandatory lab scope small: no frontend, authentication/JWT, cloud hosting or required
+Historical Lab 1 scope (superseded for Lab 2 security by user authorization on 2026-10-16): no frontend, authentication/JWT, cloud hosting or required
 unit-test framework. The user approved implementation of the simple LMS UI on
 2026-09-22 after the design brief; no extra framework/project is needed.
 Contract checks and the instructor's grader still belong

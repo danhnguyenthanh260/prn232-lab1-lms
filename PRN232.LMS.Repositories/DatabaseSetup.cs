@@ -11,6 +11,7 @@ public static class DatabaseSetup
     {
         services.AddDbContext<LmsDbContext>(options => options.UseSqlServer(connection));
         services.AddScoped<ILmsRepository, LmsRepository>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddHostedService<DatabaseInitializer>();
         return services;
     }
@@ -29,6 +30,25 @@ internal sealed class DatabaseInitializer(IServiceProvider services) : IHostedSe
                 using var scope = services.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<LmsDbContext>();
                 await db.Database.EnsureCreatedAsync(cancellationToken);
+                // Additive upgrade for an existing Lab 1 database. Never reset its data.
+                await db.Database.ExecuteSqlRawAsync("""
+                    IF OBJECT_ID(N'Users', N'U') IS NULL
+                    BEGIN
+                      CREATE TABLE Users (UserId int IDENTITY PRIMARY KEY, Username varchar(50) NOT NULL,
+                        PasswordHash varchar(255) NOT NULL, Role varchar(20) NOT NULL);
+                      CREATE UNIQUE INDEX IX_Users_Username ON Users(Username);
+                    END;
+                    IF OBJECT_ID(N'RefreshTokens', N'U') IS NULL
+                    BEGIN
+                      CREATE TABLE RefreshTokens (RefreshTokenId int IDENTITY PRIMARY KEY, UserId int NOT NULL,
+                        TokenHash varchar(64) NOT NULL, ExpiresAt datetime2 NOT NULL, RevokedAt datetime2 NULL,
+                        CONSTRAINT FK_RefreshTokens_Users_UserId FOREIGN KEY(UserId) REFERENCES Users(UserId) ON DELETE CASCADE);
+                      CREATE UNIQUE INDEX IX_RefreshTokens_TokenHash ON RefreshTokens(TokenHash);
+                      CREATE INDEX IX_RefreshTokens_UserId ON RefreshTokens(UserId);
+                    END;
+                    IF COL_LENGTH('Students', 'PhoneNumber') IS NULL
+                      ALTER TABLE Students ADD PhoneNumber varchar(30) NULL;
+                    """, cancellationToken);
                 if (await db.Semesters.AnyAsync(cancellationToken)) return;
                 await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
                 var semesters = Enumerable.Range(1, 5).Select(i => new Semester { SemesterName = $"Semester {i}", StartDate = new(2024 + i / 3, (i % 3) * 4 + 1, 1), EndDate = new(2024 + i / 3, (i % 3) * 4 + 4, 28) }).ToList();
